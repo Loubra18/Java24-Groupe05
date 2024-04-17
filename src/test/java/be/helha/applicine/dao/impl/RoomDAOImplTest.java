@@ -37,7 +37,7 @@ class RoomDAOImplTest {
     void addRoom() throws Exception {
         roomDAO.removeRoom(50);
         Room room = new Room(50, 100);
-        roomDAO.addRoom(room);
+        roomDAO.addRoom(room.getCapacity());
         Room addedRoom = roomDAO.getRoomById(50);
         assertEquals(room, addedRoom, "Added room should be equal to the retrieved room");
     }
@@ -50,7 +50,7 @@ class RoomDAOImplTest {
     @Test
     void updateRoom() throws SQLException {
         Room room = new Room(50, 50);
-        roomDAO.updateRoom(room);
+        roomDAO.updateRoom(room.getNumber(), room.getCapacity());
         Room updatedRoom = roomDAO.getRoomById(50);
         assertEquals(room, updatedRoom, "Updated room should be equal to the retrieved room");
     }
@@ -58,7 +58,7 @@ class RoomDAOImplTest {
     @Test
     void removeRoom() throws Exception {
         Room room = new Room(50, 100);
-        roomDAO.addRoom(room);
+        roomDAO.addRoom(room.getCapacity());
         roomDAO.removeRoom(50);
         Room removedRoom = roomDAO.getRoomById(50);
         assertNull(removedRoom, "Removed room should be null");

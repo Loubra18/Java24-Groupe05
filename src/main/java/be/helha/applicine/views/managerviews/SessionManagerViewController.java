@@ -60,6 +60,23 @@ public class SessionManagerViewController {
     @FXML
     private Button deleteButton;
 
+    //Room manager fxml elements
+    @FXML
+    private Button validateRoomButton;
+
+    @FXML
+    private Button cancelRoomButton;
+
+
+    @FXML
+    private TextField freePlacesSetter;
+
+    @FXML
+    private ComboBox <String> roomToEditSelector;
+
+    //End of Room manager fxml elements
+
+
     VBox vBoxToDisplay = new VBox();
 
 
@@ -72,6 +89,7 @@ public class SessionManagerViewController {
     private Integer currentRoomSelection = -1;
 
     private int currentSessionID = -1;
+    private String currentRoomEditionType ="add";
 
     /**
      * Initializes the controller class.
@@ -158,7 +176,6 @@ public class SessionManagerViewController {
     public void setVersionSelectorPossibilities() {
         versionSelector.getItems().add("2D");
         versionSelector.getItems().add("3D");
-
     }
 
     /**
@@ -266,8 +283,6 @@ public class SessionManagerViewController {
      * @param movieSession
      */
     private void onSessionButtonClick(MovieSession movieSession) {
-
-
         this.currentSessionID = movieSession.getId();
         System.out.println("l'ID de la session est " + currentSessionID);
         this.currentEditionType = "modify";
@@ -359,6 +374,14 @@ public class SessionManagerViewController {
         }
     }
 
+    public void onRoomIDChoiced(ActionEvent event) {
+        if(roomToEditSelector.getValue().equals("+")) {
+            currentRoomEditionType = "add";
+        }else {
+            currentRoomEditionType = "modify";
+        }
+    }
+
     /**
      * Interface for the session manager view listener.
      */
@@ -380,6 +403,10 @@ public class SessionManagerViewController {
         void onDeleteButtonClick(int currentSessionID);
 
         MovieSession getMovieSessionById(int id);
+
+        void onRoomValidateButtonClick(Integer roomNumber, Integer freePlaces, String currentRoomEditionType);
+
+        void onRoomCancelButtonClick();
     }
 
     /**
@@ -544,6 +571,30 @@ public class SessionManagerViewController {
     public MovieSession getMovieSessionById(int id) {
         return listener.getMovieSessionById(id);
     }
+    
+    //Specific methods for the room manager
+    
+    public void onRoomValidateButtonClick(ActionEvent event) {
+        listener.onRoomValidateButtonClick(Integer.parseInt(roomToEditSelector.getValue()), Integer.parseInt(freePlacesSetter.getText()), currentRoomEditionType);
+    }
+    
+    public void onRoomCancelButtonClick(ActionEvent event) {
+        listener.onRoomCancelButtonClick();
+    }
+    
+    public void setRoomToEditSelector(List<String> roomNumbers) {
+        roomToEditSelector.getItems().clear();
+        for (String i : roomNumbers) {
+            roomToEditSelector.getItems().add(i);
+        }
+    }
+
+    public void clearRooms() {
+        roomToEditSelector.getItems().clear();
+        freePlacesSetter.clear();
+    }
+    
+    
 
 
 }

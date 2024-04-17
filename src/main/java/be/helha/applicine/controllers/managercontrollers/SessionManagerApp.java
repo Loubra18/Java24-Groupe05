@@ -14,6 +14,7 @@ import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 //ecoute les changements de la liste de films et de la liste de séances de l'app MovieManagerApp
@@ -161,15 +162,7 @@ public class SessionManagerApp extends ManagerController implements SessionManag
         return duration;
     }
 
-    /**
-     * Sets the possible rooms that can be selected in the view.
-     */
-    @Override
-    public void setPossibleRooms() {
-        for (Room r : roomList) {
-            sessionManagerViewController.addPossibleRoom(r.getNumber());
-        }
-    }
+
 
     /**
      * Returns the movie from the current selection in the view.
@@ -219,6 +212,13 @@ public class SessionManagerApp extends ManagerController implements SessionManag
         return movieSessionList.get(id);
     }
 
+
+
+    @Override
+    public void onRoomCancelButtonClick() {
+
+    }
+
     /**
      * Returns a room from an index.
      *
@@ -259,4 +259,59 @@ public class SessionManagerApp extends ManagerController implements SessionManag
         System.out.println("SessionManagerApp invalidated");
 
     }
+
+
+    //room management
+    @Override
+    public void onRoomValidateButtonClick(Integer roomNumber, Integer freePlaces, String currentRoomEditionType) {
+
+        if(roomNumber == null || freePlaces == null){
+            showAlert(Alert.AlertType.ERROR, "Erreur", "Champs invalides", "Tous les champs n'ont pas été remplis");
+            return;
+        }
+
+        if(currentRoomEditionType.equals("add")){
+
+            roomDAO.addRoom(freePlaces);
+        } else if(currentRoomEditionType.equals("modify")){
+            roomDAO.updateRoom(roomNumber, freePlaces);
+        }
+
+        refreshRoomManager();
+    }
+
+
+
+    /**
+     * Sets the possible rooms that can be selected in the view.
+     */
+    @Override
+    public void setPossibleRooms() {
+        List<Integer> roomNumbersToSet = new ArrayList<>();
+        for (Room r : roomList) {
+            sessionManagerViewController.addPossibleRoom(r.getNumber());
+            roomNumbersToSet.add( r.getNumber());
+        }
+        List<String> roomNumbers = new ArrayList<>();
+        for (Integer i : roomNumbersToSet) {
+            roomNumbers.add(i.toString());
+        }
+        roomNumbers.add("+");
+        sessionManagerViewController.setRoomToEditSelector(roomNumbers);
+    }
+
+
+    private void refreshRoomManager() {
+
+        try {
+            this.roomList = roomDAO.getAllRooms();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        sessionManagerViewController.clearRooms();
+        for (Room room : roomList) {
+            sessionManagerViewController.addPossibleRoom(room.getNumber());
+        }
+    }
+
 }

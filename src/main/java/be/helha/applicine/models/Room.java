@@ -21,7 +21,7 @@ public class Room {
         return number;
     }
 
-    public int getCapacity() {
+    public Integer getCapacity() {
         return capacity;
     }
 

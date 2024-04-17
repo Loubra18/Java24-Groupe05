@@ -20,7 +20,7 @@ public class RoomDAOImpl implements RoomDAO {
     private static final String SELECT_ALL_ROOMS = "SELECT * FROM rooms";
     private static final String SELECT_ROOM_BY_ID = "SELECT * FROM rooms WHERE id = ?";
 
-    private static final String ADD_ROOM = "INSERT INTO rooms (seatsnumber, id) VALUES (?, ?)";
+    private static final String ADD_ROOM = "INSERT INTO rooms (seatsnumber) VALUES (?)";
 
     private static final String UPDATE_ROOM = "UPDATE rooms SET seatsnumber = ? WHERE id = ?";
 
@@ -83,14 +83,13 @@ public class RoomDAOImpl implements RoomDAO {
 
     /**
      * add a room
-     * @param room
+     * @param roomCapacity
      */
     @Override
-    public void addRoom(Room room) {
+    public void addRoom(Integer roomCapacity) {
         try {
             PreparedStatement pstmt = connection.prepareStatement(ADD_ROOM);
-            pstmt.setInt(1, room.getCapacity());
-            pstmt.setInt(2, room.getNumber());
+            pstmt.setInt(1, roomCapacity);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Erreur lors de l'ajout de la salle : " + e.getMessage());
@@ -102,14 +101,15 @@ public class RoomDAOImpl implements RoomDAO {
 
     /**
      * update a room
-     * @param room
+     * @param roomID
+     * @param roomCapacity
      */
     @Override
-    public void updateRoom(Room room) {
+    public void updateRoom(Integer roomID, Integer roomCapacity) {
         try {
             PreparedStatement pstmt = connection.prepareStatement(UPDATE_ROOM);
-            pstmt.setInt(1, room.getCapacity());
-            pstmt.setInt(2, room.getNumber());
+            pstmt.setInt(1, roomID);
+            pstmt.setInt(2, roomCapacity);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Erreur lors de la mise à jour de la salle : " + e.getMessage());

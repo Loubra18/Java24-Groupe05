@@ -6,6 +6,7 @@
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
@@ -38,5 +39,14 @@
          </children>
       </AnchorPane>
       <ScrollPane fx:id="sessionsList" layoutX="26.0" layoutY="24.0" prefHeight="515.0" prefWidth="252.0" />
+      <AnchorPane layoutX="385.0" layoutY="438.0" prefHeight="145.0" prefWidth="301.0" style="-fx-border-color: black;">
+         <children>
+            <Label layoutX="71.0" layoutY="14.0" prefHeight="18.0" prefWidth="158.0" text="Ajouter/modifier une salle" />
+            <ComboBox fx:id="roomToEditSelector" layoutX="14.0" layoutY="42.0" onAction="#onRoomIDChoiced" prefHeight="26.0" prefWidth="78.0" promptText="Salle" />
+            <TextField fx:id="freePlacesSetter" layoutX="166.0" layoutY="73.0" prefHeight="26.0" prefWidth="115.0" promptText="Places disponibles" />
+            <Button fx:id="validateRoomButton" layoutX="14.0" layoutY="109.0" mnemonicParsing="false" onAction="#onRoomValidateButtonClick" text="Valider" />
+            <Button fx:id="cancelRoomButton" layoutX="100.0" layoutY="109.0" mnemonicParsing="false" onAction="#onRoomCancelButtonClick" text="Annuler" />
+         </children>
+      </AnchorPane>
    </children>
 </AnchorPane>
