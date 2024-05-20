@@ -40,7 +40,6 @@ public class ManagerController extends Application {
 
     /**
      * It fetches all the movies from the database to movieList.
-     * It follows the DAO design pattern https://www.digitalocean.com/community/tutorials/dao-design-pattern.
      */
     public ManagerController(MasterApplication parentController) throws SQLException, IOException, ClassNotFoundException {
         this.parentController = parentController;
@@ -49,6 +48,9 @@ public class ManagerController extends Application {
         movieList = serverRequestHandler.sendRequest(request);
     }
 
+    /**
+     * It fetches all the movies from the database to movieList.
+     */
     public ManagerController() throws IOException, ClassNotFoundException {
         GetMoviesRequest request = new GetMoviesRequest();
         serverRequestHandler = ServerRequestHandler.getInstance();
@@ -57,37 +59,28 @@ public class ManagerController extends Application {
 
     /**
      * Starts the Manager view.
-     *
      * @param adminPage the stage of the view.
      * @throws IOException  if there is an error with the fxml file.
      * @throws SQLException if there is an error with the database connection.
      */
     @Override
     public void start(Stage adminPage) throws IOException, SQLException, ClassNotFoundException {
-
         MainManagerViewController.setStageOf(mainFxmlLoader);
-
         parentController.setCurrentWindow(MainManagerViewController.getStage());
-
         mainManagerViewController = mainFxmlLoader.getController();
         mainManagerViewController.setListener(this);
 
         MovieManagerApp movieManagerApp = new MovieManagerApp(parentController);
         movieManagerApp.setParentController(this);
-
-
         SessionManagerApp sessionManagerApp = new SessionManagerApp(parentController);
         sessionManagerApp.setParentController(this);
 
         SpecialViewableController specialViewableController = new SpecialViewableController(parentController);
         specialViewableController.setParentController(this);
-
-
         movieManagerApp.addListener(sessionManagerApp);
         movieManagerApp.addSpecialViewablesListener(specialViewableController);
 
         specialViewableController.addListener(sessionManagerApp);
-
         movieManagerApp.start(adminPage);
         sessionManagerApp.start(adminPage);
         specialViewableController.start(adminPage);
@@ -98,19 +91,11 @@ public class ManagerController extends Application {
 
     /**
      * Launches the Manager view.
-     *
      * @param args the arguments of the main method.
      */
     public static void main(String[] args) {
         launch();
     }
-
-    /**
-     * It returns a movie to the movieList at index.
-     * @param index the index of the movie in the movieList.
-     * @return movieList
-     */
-
 
     /**
      * Redirects to the login view and disconnect the user.
@@ -121,7 +106,6 @@ public class ManagerController extends Application {
 
     /**
      * It returns the full movie list from the database.
-     *
      * @return List of Visionable objects which contains all the movies from the database.
      */
     public List<Movie> fullFieldMovieListFromDB() throws ClassNotFoundException, IOException {
@@ -131,8 +115,7 @@ public class ManagerController extends Application {
 
     /**
      * It returns the fxmlLoader of the movieManager.
-     *
-     * @return
+     * @return the fxmlLoader of the movieManager.
      */
 
     protected FXMLLoader getMovieManagerFXML() {
@@ -141,18 +124,25 @@ public class ManagerController extends Application {
 
     /**
      * It returns the fxmlLoader of the sessionManager.
-     *
-     * @return
+     * @return the fxmlLoader of the sessionManager.
      */
-
     protected FXMLLoader getSessionManagerFXML() {
         return mainManagerViewController.getSessionManagerFXML();
     }
 
+    /**
+     * It returns the fxmlLoader of the specialViewable.
+     * @return the fxmlLoader of the specialViewable.
+     */
     protected FXMLLoader getSpecialViewableFXML() {
         return mainManagerViewController.getSpecialViewableFXML();
     }
 
+    /**
+     * It returns the movie from the database at index.
+     * @param id the index of the movie in the movieList.
+     * @return the movie from the database at index.
+     */
     public Movie getMovieFrom(int id) {
         return serverRequestHandler.sendRequest(new GetMovieByIdRequest(id));
     }

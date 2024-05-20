@@ -71,9 +71,10 @@ public class MasterApplication extends Application {
      * Switch to the client window and close the currentWindow.
      */
     public void toClient() {
-        if (currentWindow != null)
-            closeAllWindows();
         try {
+            if (currentWindow != null) {
+                closeAllWindows();
+            }
             ClientController clientController = new ClientController(this);
             clientController.start(new Stage());
         } catch (Exception e) {
@@ -109,10 +110,16 @@ public class MasterApplication extends Application {
     /**
      * Switch to the client account window and close the currentWindow.
      */
-    public void toClientAccount() throws IOException {
-        closeAllWindows();
-        ClientAccountApplication clientAccountApplication = new ClientAccountApplication(this);
-        clientAccountApplication.start(new Stage());
+    public void toClientAccount() {
+        try {
+            closeAllWindows();
+            ClientAccountApplication clientAccountApplication = new ClientAccountApplication(this);
+            clientAccountApplication.start(new Stage());
+        } catch (IOException e) {
+            AlertViewController.showErrorMessage("Erreur lors de l'ouverture de la fenêtre de compte client, tentez de vous reconnecter. Si l'erreur persiste contactez un administrateur réseaux.");
+            closeAllWindows();
+            toLogin();
+        }
     }
 
     public void toRegistration() {
@@ -133,7 +140,7 @@ public class MasterApplication extends Application {
         currentWindow.hide();
     }
 
-    public void toTicketPage() throws Exception {
+    public void toTicketPage() {
         TicketPageController ticketPageController = new TicketPageController(this);
         ticketPageController.start(new Stage());
     }

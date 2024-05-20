@@ -160,19 +160,12 @@ public class SessionManagerViewController {
     /**
      * Validates the session and sends the data to the listener.
      * @param event the event of the button click.
-     * @throws SQLException if there is an error with the database connection.
-     * @throws InvalideFieldsExceptions if the fields are invalid.
      */
-    public void onValidateButtonClick(ActionEvent event) throws SQLException, InvalideFieldsExceptions {
-        try {
-            if (currentEditionType.equals("add")) {
-                listener.onValidateButtonClick(0, currentMovieSelection, roomSelector.getValue(), versionSelector.getValue(), converDateAndHourToDateTime(), this.currentEditionType);
-            } else if (currentEditionType.equals("modify")) {
-                listener.onValidateButtonClick(currentSessionID, currentMovieSelection, roomSelector.getValue(), versionSelector.getValue(), converDateAndHourToDateTime(), this.currentEditionType);
-            }
-        } catch (IndexOutOfBoundsException e) {
-            AlertViewController.showErrorMessage("Erreur lors du traitement de la demande, veuillez réessayer plus tard.");
-
+    public void onValidateButtonClick(ActionEvent event) {
+        if (currentEditionType.equals("add")) {
+            listener.onValidateButtonClick(0, currentMovieSelection, roomSelector.getValue(), versionSelector.getValue(), converDateAndHourToDateTime(), this.currentEditionType);
+        } else if (currentEditionType.equals("modify")) {
+            listener.onValidateButtonClick(currentSessionID, currentMovieSelection, roomSelector.getValue(), versionSelector.getValue(), converDateAndHourToDateTime(), this.currentEditionType);
         }
     }
 
@@ -182,7 +175,7 @@ public class SessionManagerViewController {
 
     /**
      * Sets the listener.
-     * @param listener
+     * @param listener the listener to set.
      */
     public void setListener(SessionManagerViewListener listener) {
         this.listener = listener;
@@ -190,7 +183,7 @@ public class SessionManagerViewController {
 
     /**
      * Adds a possible name to the movie selector.
-     * @param name
+     * @param name the name to add.
      */
     public void addPossibleName(String name) {
         movieSelector.getItems().add(name);
@@ -198,7 +191,7 @@ public class SessionManagerViewController {
 
     /**
      * Adds a possible room to the room selector.
-     * @param number
+     * @param number the number of the room to add.
      */
 
     public void addPossibleRoom(int number) {
@@ -207,10 +200,9 @@ public class SessionManagerViewController {
 
     /**
      * Sets the current room selection and sends it to the listener.
-     * @param event
-     * @throws SQLException
+     * @param event the event of the button click.
+     * @throws SQLException if an SQL exception occurs.
      */
-
     public void onRoomSelectedEvent(ActionEvent event) throws SQLException {
         currentRoomSelection = roomSelector.getValue();
         listener.onRoomSelectedEvent(currentRoomSelection);
@@ -218,18 +210,15 @@ public class SessionManagerViewController {
 
     /**
      * Sets the room capacity.
-     *
-     * @param capacity
+     * @param capacity the capacity to set.
      */
-
     public void setRoomCapacity(int capacity) {
         freePlacesLabel.setText(capacity + " places libres");
     }
 
     /**
      * Cancels the session edition.
-     *
-     * @param event
+     * @param event the event of the button click.
      */
     public void onCancelButtonClick(ActionEvent event) {
         this.sessionEditPane.setVisible(false);
@@ -239,10 +228,8 @@ public class SessionManagerViewController {
     /**
      * Displays a session in the sessions list.
      * Set the button on click event to display the session edition pane.
-     *
-     * @param movieSession
+     * @param movieSession the session to display.
      */
-
     public void createDisplaySessionButton(MovieSession movieSession) {
         Button button = new Button(movieSession.getViewable().getTitle() + " " + movieSession.getTime() + " " + movieSession.getRoom().getNumber());
         button.prefWidthProperty().bind(vBoxToDisplay.widthProperty());
@@ -352,7 +339,7 @@ public class SessionManagerViewController {
      */
 
     public interface SessionManagerViewListener {
-        void onValidateButtonClick(Integer sessionId, Integer movieId, Integer roomId, String version, String convertedDateTime, String currentEditType) throws SQLException, InvalideFieldsExceptions;
+        void onValidateButtonClick(Integer sessionId, Integer movieId, Integer roomId, String version, String convertedDateTime, String currentEditType);
 
         void setPossibleMovies();
 
@@ -498,34 +485,42 @@ public class SessionManagerViewController {
 
     /**
      * Sets the selection style of the selected button.
-     *
-     * @param button
+     * @param button the button to set the selection style to.
      */
-
     public void setSelection(Button button) {
         try {
             setInitialStyleButtons();
             button.getStyleClass().add("Selected");
         } catch (IndexOutOfBoundsException e) {
-
+            AlertViewController.showErrorMessage("Erreur lors de la sélection de la séance. Celle-ci n'existe pas. Veuillez redémarrer l'application.");
         }
     }
 
     /**
      * Clears the possible names of the movie selector.
      */
-
     public void clearPossibleNames() {
         movieSelector.getItems().clear();
     }
 
+    /**
+     * @return the movie session with the given index.
+     */
     public MovieSession getMovieSessionById(int id) {
         return listener.getMovieSessionById(id);
     }
 
+    /**
+     * Clears the possible rooms of the room selector.
+     */
+    public void clearPossibleRooms() {
+        roomSelector.getItems().clear();
+    }
 
+    /**
+     * @return the viewable ID by selection.
+     */
     public int getViewableIDBySelection(int index) {
         return listener.getViewableFrom(index).getId();
     }
-
 }

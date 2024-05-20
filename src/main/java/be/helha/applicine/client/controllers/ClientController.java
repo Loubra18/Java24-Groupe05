@@ -29,11 +29,9 @@ public class ClientController extends Application implements ClientViewControlle
 
     /**
      * starts the client view.
-     *
-     * @param clientWindow
-     * @throws Exception
+     * @param clientWindow The stage of the client view.
      */
-    public void start(Stage clientWindow) throws Exception {
+    public void start(Stage clientWindow) {
         try {
             serverRequestHandler = ServerRequestHandler.getInstance();
             FXMLLoader clientFXML = new FXMLLoader(ClientViewController.getFXMLResource());
@@ -55,18 +53,16 @@ public class ClientController extends Application implements ClientViewControlle
         }
     }
 
-    private List<Viewable> getMovies() throws IOException, ClassNotFoundException {
+    private List<Viewable> getMovies() {
         GetMoviesRequest request = new GetMoviesRequest();
         return serverRequestHandler.sendRequest(request);
-//        List<Viewable> movies = (List<Viewable>) serverRequestHandler.sendRequest("GET_MOVIES");
-//        return movies;
     }
 
     /**
      * Add movies to the client view.
      *
-     * @param controller
-     * @param movies
+     * @param controller The controller of the client view.
+     * @param movies The list of movies to add.
      */
     public void addMovies(ClientViewController controller, List<Viewable> movies) {
         for (Viewable movie : movies) {
@@ -76,8 +72,7 @@ public class ClientController extends Application implements ClientViewControlle
 
     /**
      * Switches to the login page.
-     *
-     * @throws Exception
+     * @throws Exception if there is an error with the fxml file.
      */
     @Override
     @FXML
@@ -87,8 +82,7 @@ public class ClientController extends Application implements ClientViewControlle
 
     /**
      * Setter for the current window.
-     *
-     * @param currentWindow
+     * @param currentWindow The current window.
      */
     @Override
     public void setCurrentWindow(Window currentWindow) {
@@ -97,18 +91,16 @@ public class ClientController extends Application implements ClientViewControlle
 
     /**
      * Switches to the client account page.
-     *
-     * @throws Exception
      */
     @Override
     @FXML
-    public void toClientAccount() throws Exception {
+    public void toClientAccount() {
         System.out.println("Account button clicked, je vais afficher les informations du compte");
         parentController.toClientAccount();
     }
 
     @Override
-    public void onBuyTicketClicked(Viewable movie) throws Exception {
+    public void onBuyTicketClicked(Viewable movie) {
         Session session = parentController.getSession();
         if (session.isLogged()) {
             TicketPageController ticketPageController = new TicketPageController(parentController);

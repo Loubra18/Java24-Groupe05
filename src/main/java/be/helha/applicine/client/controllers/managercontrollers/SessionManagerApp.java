@@ -49,10 +49,14 @@ public class SessionManagerApp extends ManagerController implements SessionManag
         this.movieSessionList = serverRequestHandler.sendRequest(new GetAllSessionRequest());
     }
 
+    /**
+     * Constructor, super calls ManagerController constructor which initializes the movieDAO and fetches all the movies from the database.
+     * @throws IOException if there is an error with the database connection, created in ManagerController.
+     * @throws ClassNotFoundException if there is an error with the database connection, created in ManagerController.
+     */
     public SessionManagerApp() throws IOException, ClassNotFoundException {
         super();
     }
-
 
     /**
      * Starts the session manager view.
@@ -61,14 +65,14 @@ public class SessionManagerApp extends ManagerController implements SessionManag
      */
     @Override
     public void start(Stage adminPage) {
-        sessionManagerFxmlLoader = parentController.getSessionManagerFXML();
-        sessionManagerViewController = sessionManagerFxmlLoader.getController();
-        sessionManagerViewController.setListener(this);
-        sessionManagerViewController.init();
         try {
+            sessionManagerFxmlLoader = parentController.getSessionManagerFXML();
+            sessionManagerViewController = sessionManagerFxmlLoader.getController();
+            sessionManagerViewController.setListener(this);
+            sessionManagerViewController.init();
+            sessionManagerViewController.displaySessions();
             for (MovieSession movieSession : movieSessionList) {
                 sessionManagerViewController.createDisplaySessionButton(movieSession);
-                System.out.println(movieSession.getId());
             }
         } catch (NullPointerException e) {
             AlertViewController.showErrorMessage("Problème d'affichage, la séance n'existe pas. Tentez de vous reconnecter.");
@@ -77,7 +81,6 @@ public class SessionManagerApp extends ManagerController implements SessionManag
                 parentController.toLogin();
             }
         }
-        sessionManagerViewController.displaySessions();
     }
 
     /**
@@ -90,13 +93,12 @@ public class SessionManagerApp extends ManagerController implements SessionManag
 
     /**
      * Adds a new session to the database or modify the selected session.
-     * @param sessionId the id of the session
-     * @param movieId the id of the movie
-     * @param roomId the id of the room
-     * @param version the version of the movie
-     * @param convertedDateTime the date and time of the session
-     * @param currentEditType the type of the edit (add or modify)
-     * @throws InvalideFieldsExceptions if the fields are invalid (empty or wrong format)
+     * @param sessionId the id of the session.
+     * @param movieId the id of the movie.
+     * @param roomId the id of the room.
+     * @param version the version of the movie.
+     * @param convertedDateTime the date and time of the session.
+     * @param currentEditType the type of the edit (add or modify).
      */
     @Override
     public void onValidateButtonClick(Integer sessionId, Integer movieId, Integer roomId, String version, String convertedDateTime, String currentEditType) {
@@ -174,9 +176,8 @@ public class SessionManagerApp extends ManagerController implements SessionManag
 
     /**
      * Returns the viewable from the current selection in the view.
-     *
-     * @param currentSelection
-     * @return
+     * @param currentSelection the current selection
+     * @return the viewable from the current selection
      */
     public Viewable getViewableFrom(Integer currentSelection) {
         return viewableList.get(currentSelection);
@@ -184,11 +185,10 @@ public class SessionManagerApp extends ManagerController implements SessionManag
 
     /**
      * Returns the room from the current selection in the view.
-     * @param value
-     * @throws SQLException
+     * @param value the current selection
      */
     @Override
-    public void onRoomSelectedEvent(Integer value) throws SQLException {
+    public void onRoomSelectedEvent(Integer value) {
         if (value == null) {
             return;
         }
@@ -199,8 +199,7 @@ public class SessionManagerApp extends ManagerController implements SessionManag
 
     /**
      * Deletes a session from the database.
-     *
-     * @param currentSessionID
+     * @param currentSessionID the id of the session to delete
      */
     @Override
     public void onDeleteButtonClick(int currentSessionID) {
@@ -212,6 +211,11 @@ public class SessionManagerApp extends ManagerController implements SessionManag
         }
     }
 
+    /**
+     * Returns the movie session from an id.
+     * @param id the id of the movie session
+     * @return the movie session from the id
+     */
     @Override
     public MovieSession getMovieSessionById(int id) {
         return movieSessionList.get(id);
@@ -230,16 +234,20 @@ public class SessionManagerApp extends ManagerController implements SessionManag
      * Refreshes the session manager view.
      */
     public void refreshSessionManager() {
-        sessionManagerViewController.clearSessions();
         try {
+            sessionManagerViewController.clearSessions();
             for (MovieSession movieSession : movieSessionList) {
                 sessionManagerViewController.createDisplaySessionButton(movieSession);
             }
-        } catch (NullPointerException ignored) {
-
+            sessionManagerViewController.displaySessions();
+            sessionManagerViewController.refreshAfterEdit();
+        } catch (NullPointerException e) {
+            AlertViewController.showErrorMessage("Problème de rafraichissement de la page. Tentez de vous reconnecter ainsi de recharger la page.");
+            boolean confirmed = AlertViewController.showConfirmationMessage("Voulez-vous vous reconnecter ?");
+            if (confirmed) {
+                parentController.toLogin();
+            }
         }
-        sessionManagerViewController.displaySessions();
-        sessionManagerViewController.refreshAfterEdit();
     }
 
     /**
@@ -256,6 +264,11 @@ public class SessionManagerApp extends ManagerController implements SessionManag
         System.out.println("SessionManagerApp invalidated");
     }
 
+    /**
+     * Returns the room from the id.
+     * @param id the id of the room
+     * @return the room from the id
+     */
     public Room getRoomById(int id){
         return serverRequestHandler.sendRequest(new GetRoomByIdRequest(id));
     }

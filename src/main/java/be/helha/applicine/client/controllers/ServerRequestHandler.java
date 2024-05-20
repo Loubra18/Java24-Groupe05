@@ -26,6 +26,7 @@ public class ServerRequestHandler {
         } catch (IOException | ClassNotFoundException e) {
             AlertViewController.showErrorMessage("Erreur lors de la connexion au serveur, veuillez réessayer plus tard.");
             return null;
+
         }
     }
     public static ServerRequestHandler getInstance() throws IOException {

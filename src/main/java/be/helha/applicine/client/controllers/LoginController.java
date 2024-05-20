@@ -17,7 +17,6 @@ import java.util.Objects;
 public class LoginController extends Application implements LoginViewController.LoginViewListener {
     /**
      * The parent controller of the Login window used to navigate between windows.
-     *
      * @see MasterApplication
      */
     private MasterApplication parentController;
@@ -33,7 +32,6 @@ public class LoginController extends Application implements LoginViewController.
 
     /**
      * Starts the Login window.
-     *
      * @param stage the stage of the Login window.
      * @throws IOException
      */
@@ -48,7 +46,6 @@ public class LoginController extends Application implements LoginViewController.
 
     /**
      * Launches the Login window.
-     *
      * @param args the arguments of the application.
      */
     public static void main(String[] args) {
@@ -57,7 +54,6 @@ public class LoginController extends Application implements LoginViewController.
 
     /**
      * Handles the input from the user.
-     *
      * @param username
      * @param password
      * @return true if the input is correct, false otherwise.
@@ -65,25 +61,16 @@ public class LoginController extends Application implements LoginViewController.
     @Override
     public boolean inputHandling(String username, String password) {
         if(Objects.equals(username, "admin") && Objects.equals(password, "admin")){
-            try {
-                toAdmin();
-                return true;
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-                loginViewController.showError("Unable to connect to the server.");
-            }
+            toAdmin();
+            return true;
         }
-        try {
-            Client client = serverRequestHandler.sendRequest(new CheckLoginRequest(username, password));
-            if (client != null) {
-                Session session = parentController.getSession();
-                session.setCurrentClient(client);
-                session.setLogged(true);
-                toClient();
-                return true;
-            }
-        } catch (Exception e) {
-            loginViewController.showError("Unable to connect to the server.");
+        Client client = serverRequestHandler.sendRequest(new CheckLoginRequest(username, password));
+        if (client != null) {
+            Session session = parentController.getSession();
+            session.setCurrentClient(client);
+            session.setLogged(true);
+            toClient();
+            return true;
         }
         return false;
     }
