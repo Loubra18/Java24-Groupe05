@@ -65,6 +65,10 @@ public class ClientHandler extends Thread implements RequestVisitor {
     public void visit(UpdateMovieRequest updateMovieRequest) {
         Movie movie = updateMovieRequest.getMovie();
         try {
+            if (movie.getImage() != null) {
+                movie.setImagePath(FileManager.createPath(removeSpecialCharacters(movie.getTitle()) + ".jpg"));
+                FileManager.createImageFromBytes(movie.getImage(), movie.getImagePath());
+            }
             movieDAO.update(movie);
             out.writeObject("MOVIE_UPDATED");
         } catch (IOException e) {
@@ -188,8 +192,14 @@ public class ClientHandler extends Thread implements RequestVisitor {
     @Override
     public void visit(CreateMovieRequest createMovieRequest) throws IOException {
         Movie movie = createMovieRequest.getMovie();
+        movie.setImagePath(FileManager.createPath(removeSpecialCharacters(movie.getTitle()) + ".jpg"));
+        FileManager.createImageFromBytes(movie.getImage(), movie.getImagePath());
         movieDAO.create(movie);
         out.writeObject("MOVIE_ADDED");
+    }
+
+    public static String removeSpecialCharacters(String str) {
+        return str.replaceAll("[^a-zA-Z0-9\\s]", "");
     }
 
     @Override
@@ -260,7 +270,7 @@ public class ClientHandler extends Thread implements RequestVisitor {
     public void visit(GetSessionByMovieId getSessionByMovieId) {
         int movieId = getSessionByMovieId.getMovieId();
         try {
-            out.writeObject(sessionDAO.getSessionsForMovie(movieDAO.get(movieId)));
+            out.writeObject(sessionDAO.getSessionsForMovie(viewableDAO.getViewableById(movieId)));
         } catch (IOException | SQLException e) {
             throw new RuntimeException(e);
         }

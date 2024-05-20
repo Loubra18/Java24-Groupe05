@@ -94,7 +94,7 @@ public class MoviePaneViewController {
         }
         else if(movie instanceof Saga){
             movies = ((Saga) movie).getMovies();
-            this.movie = movies.getFirst();
+            this.movie = movie;
             currentMovieIndex = 0;
             sagaLabel.setVisible(true);
             titleLabel.setText(movie.getTitle());
@@ -167,7 +167,7 @@ public class MoviePaneViewController {
         if (currentMovieIndex == movies.size()) {
             currentMovieIndex = 0;
         }
-        setMovie(movies.get(currentMovieIndex));
+        imageView.setImage(new Image(new ByteArrayInputStream(movies.get(currentMovieIndex).getImage())));
     }
 
     public void showPreviousMovie(ActionEvent actionEvent) {
@@ -176,7 +176,7 @@ public class MoviePaneViewController {
         if (currentMovieIndex < 0) {
             currentMovieIndex = movies.size() - 1;
         }
-        setMovie(movies.get(currentMovieIndex));
+        imageView.setImage(new Image(new ByteArrayInputStream(movies.get(currentMovieIndex).getImage())));
     }
 
     public interface MoviePaneViewListener {

@@ -20,7 +20,7 @@ public class TicketPageController extends Application implements TicketShoppingV
 
     private final MasterApplication parentController;
     private int clientID;
-    private Viewable movie;
+    private Viewable viewable;
     private SessionDAO sessionDAO;
     private MovieSession selectedSession;
 
@@ -37,10 +37,11 @@ public class TicketPageController extends Application implements TicketShoppingV
             stage.show();
             TicketShoppingViewController controller = fxmlLoader.getController();
             controller.setListener(this);
-            controller.setMovie(movie);
+            controller.setMovie(viewable);
+            System.out.println("Viewable: " + viewable + " ID: " + viewable.getId() + " Title: " + viewable.getTitle());
 
             // Récupérer les séances du film et les définir dans la vue.
-            List<MovieSession> sessions = getSessionsForMovie(movie);
+            List<MovieSession> sessions = getSessionsForMovie(viewable);
             if (sessions.isEmpty()) {
                 // Afficher un message à l'utilisateur
                 AlertViewController.showInfoMessage("No sessions available for this movie.");
@@ -104,8 +105,8 @@ public class TicketPageController extends Application implements TicketShoppingV
         }
     }
 
-    public void setMovie(Viewable movie) {
-        this.movie = movie;
+    public void setViewable(Viewable viewable) {
+        this.viewable = viewable;
     }
 
     public void closeWindow() {
@@ -113,6 +114,7 @@ public class TicketPageController extends Application implements TicketShoppingV
     }
 
     public List<MovieSession> getSessionsForMovie(Viewable movie) throws SQLException {
+        System.out.println("Getting sessions for movie: " + movie.getId());
         GetSessionByMovieId request = new GetSessionByMovieId(movie.getId());
         try {
             return serverRequestHandler.sendRequest(request);

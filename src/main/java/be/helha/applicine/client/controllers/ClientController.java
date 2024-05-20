@@ -5,7 +5,6 @@ import be.helha.applicine.common.models.Session;
 import be.helha.applicine.common.models.Viewable;
 import be.helha.applicine.client.views.ClientViewController;
 import be.helha.applicine.client.views.MoviePaneViewController;
-import be.helha.applicine.common.models.request.GetMoviesRequest;
 import be.helha.applicine.common.models.request.GetViewablesRequest;
 import javafx.application.Application;
 import javafx.fxml.FXML;
@@ -105,7 +104,7 @@ public class ClientController extends Application implements ClientViewControlle
         Session session = parentController.getSession();
         if (session.isLogged()) {
             TicketPageController ticketPageController = new TicketPageController(parentController);
-            ticketPageController.setMovie(movie);
+            ticketPageController.setViewable(movie);
             ticketPageController.start(new Stage());
         } else {
             clientViewController.showNotLoggedInAlert();

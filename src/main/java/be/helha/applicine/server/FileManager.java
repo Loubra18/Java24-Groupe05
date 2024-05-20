@@ -19,26 +19,8 @@ public class FileManager {
         }
     }
 
-    /**
-     * Copies an image to the Appdata folder.
-     * @param imagePath The path of the image to copy.
-     * @return The path of the copied image.
-     */
-
-    public static String copyImageToAppdata(String imagePath) {
-        Path source = Paths.get(imagePath);
-        String fileSeparator = FileSystems.getDefault().getSeparator();
-        String imageName = imagePath.substring(imagePath.lastIndexOf(fileSeparator) + 1);
-        System.out.println(imageName);
-        Path destination = Paths.get(System.getenv("APPDATA") + "/Applicine/images/" + imageName);
-        try {
-            Files.copy(source, destination);
-            return destination.toString();
-        } catch ( FileAlreadyExistsException e) {
-            return destination.toString();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public static String createPath(String fileName) {
+        return "file:" + System.getenv("APPDATA") + "/Applicine/images/" + fileName;
     }
 
     public static byte[] fileToByteArray(File imageFile) {
@@ -54,5 +36,10 @@ public class FileManager {
             imagePath = imagePath.substring(5); // Remove the "file:" scheme
         }
         return Files.readAllBytes(Paths.get(imagePath));
+    }
+
+    public static void createImageFromBytes(byte[] imageBytes, String imagePath) throws IOException {
+        imagePath = imagePath.substring(5); // Remove the "file:" scheme
+        Files.write(Paths.get(imagePath), imageBytes);
     }
 }
