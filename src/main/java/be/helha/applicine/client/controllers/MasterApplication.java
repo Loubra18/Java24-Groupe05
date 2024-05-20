@@ -16,14 +16,7 @@ import java.util.List;
  * It is responsible for starting the application and switching between windows.
  */
 public class MasterApplication extends Application {
-    /**
-     * The current opened window of the application.
-     */
     private Window currentWindow;
-
-    /**
-     * The session of the user.
-     */
     private final Session session;
 
     /**
@@ -82,6 +75,9 @@ public class MasterApplication extends Application {
         }
     }
 
+    /**
+     * Close all the windows.
+     */
     public void closeAllWindows() {
         List<Window> stages = new ArrayList<>(Window.getWindows());
         for (Window window : stages) {
@@ -121,19 +117,27 @@ public class MasterApplication extends Application {
         }
     }
 
+    /**
+     * Switch to the registration window and close the currentWindow.
+     */
     public void toRegistration() {
         closeAllWindows();
         RegistrationController registrationController = new RegistrationController(this);
         registrationController.start(new Stage());
     }
 
+    /**
+     * Switch to the movie window and close the currentWindow.
+     */
     public static void main(String[] args) {
         launch();
     }
 
+    /**
+     * Getter for the session.
+     * @return The session.
+     */
     public Session getSession() {
         return session;
     }
 }
-
-

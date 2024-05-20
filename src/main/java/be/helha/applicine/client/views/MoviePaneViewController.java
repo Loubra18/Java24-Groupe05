@@ -102,13 +102,16 @@ public class MoviePaneViewController {
 
     /**
      * Gets the root of the movie pane.
-     *
      * @return the root of the movie pane.
      */
     public Pane getRoot() {
         return root;
     }
 
+    /**
+     * Handles the buy ticket button.
+     * @param actionEvent the action event.
+     */
     public void toBuyTicketPage(ActionEvent actionEvent) {
         try {
             listener.onBuyTicketClicked(movie);
@@ -192,6 +195,9 @@ public class MoviePaneViewController {
         imageView.setImage(new Image(new ByteArrayInputStream(movies.get(currentMovieIndex).getImage())));
     }
 
+    /**
+     * Listener for the movie pane.
+     */
     public interface MoviePaneViewListener {
         void onBuyTicketClicked(Viewable movie) throws Exception;
     }
