@@ -117,7 +117,6 @@ public class ManagerController extends Application {
      * It returns the fxmlLoader of the movieManager.
      * @return the fxmlLoader of the movieManager.
      */
-
     protected FXMLLoader getMovieManagerFXML() {
         return mainManagerViewController.getMovieManagerFXML();
     }

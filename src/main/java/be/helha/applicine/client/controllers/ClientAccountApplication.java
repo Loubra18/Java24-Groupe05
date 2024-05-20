@@ -14,6 +14,17 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The ClientAccountApplication class is the controller of the client account window.
+ * It allows the client to see his account information and his tickets.
+ * It also allows the client to return to the client window or to the login window.
+ * It communicates with the server to get the tickets of the client.
+ * It uses the ClientAccountControllerView to display the client account window.
+ * It uses the ServerRequestHandler to communicate with the server.
+ * It uses the MasterApplication to change the window and the controller of the view.
+ * It implements the ClientAccountControllerView.ClientAccountListener to listen to the client account view.
+ * @implSpec The ClientAccountApplication class is a subclass of Application.
+ */
 public class ClientAccountApplication extends Application implements ClientAccountControllerView.ClientAccountListener {
     //renvoie le fichier FXML de la vue ClientAccount
     private final FXMLLoader fxmlLoader = new FXMLLoader(ClientAccountControllerView.getFXMLResource());
@@ -23,20 +34,18 @@ public class ClientAccountApplication extends Application implements ClientAccou
 
     private ServerRequestHandler serverRequestHandler;
 
+    /**
+     * Constructor of the ClientAccountApplication
+     * @param masterApplication the parent controller (MasterApplication).
+     * @throws IOException if the server request handler can't be created.
+     */
     public ClientAccountApplication(MasterApplication masterApplication) throws IOException {
             this.parentController = masterApplication;
             this.serverRequestHandler = ServerRequestHandler.getInstance();
     }
 
-
-
-    //permet de fermer la fenêtre du client account et de retourner à la fenêtre du client. Je parle au parentController (masterApplication) pour changer de fenêtre.
-
-
     /**
      * Permit to close the client account window and return to the client window.
-     *
-     * @throws Exception
      */
     @Override
     public void toClientSide(){
@@ -45,31 +54,25 @@ public class ClientAccountApplication extends Application implements ClientAccou
 
     /**
      * Permit to close the client account window and return to the login window.
-     *
-     * @throws Exception
      */
     @Override
-    public void toClientAccount() throws Exception {
+    public void toClientAccount(){
         parentController.toClientAccount();
     }
 
     /**
      * Permit to get the client account from the actual session.
-     *
-     * @return
-     * @throws SQLException
+     * @return the client account logged in.
      */
     @Override
-    public Client getClientAccount() throws SQLException{
-            Session session = parentController.getSession();
-            return session.getCurrentClient();
+    public Client getClientAccount() {
+        Session session = parentController.getSession();
+        return session.getCurrentClient();
     }
 
     /**
-     * starts the client account window by setting the stage of the fxmlLoader and initializing the client account page.
-     *
-     * @param stage
-     * @throws Exception
+     * Starts the client account window by setting the stage of the fxmlLoader and initializing the client account page.
+     * @param stage the stage of the client account window.
      */
     @Override
     public void start(Stage stage) {
@@ -80,27 +83,29 @@ public class ClientAccountApplication extends Application implements ClientAccou
 
             parentController.setCurrentWindow(clientAccountControllerView.getAccountWindow());
 
-            //initialise la page du client account (affiche les tickets et les informations du client)
             clientAccountControllerView.initializeClientAccountPage(getClientAccount());
             List<Ticket> tickets = getTicketsByClient(getClientAccount().getId());
             addTickets(tickets, clientAccountControllerView);
-        } catch (Exception e){
-            System.out.println("Error handling client: " + e.getMessage());
-            AlertViewController.showErrorMessage("Problème de chargement de la page, veuillez réésayer plus tard. Contactez un administrateur si le problème se maintient.");
-            parentController.closeAllWindows();
+        } catch (IOException e){
+            AlertViewController.showErrorMessage("Problème de chargement de la page, veuillez réessayer plus tard. Contactez un administrateur si le problème se maintient.");
             parentController.toClient();
         }
     }
 
-    private List<Ticket> getTicketsByClient(int id) throws IOException, ClassNotFoundException {
+    /**
+     * Gets the tickets of a client by his id.
+     * @param id the id of the client.
+     * @return the list of tickets of the client.
+     */
+    private List<Ticket> getTicketsByClient(int id) {
         return serverRequestHandler.sendRequest(new GetTicketByClientRequest(id));
     }
 
     /**
-     * adds tickets to the client account page.
-     * @param tickets
+     * Adds tickets to the client account page.
+     * @param tickets the list of tickets to add.
      */
-    public void addTickets(List<Ticket> tickets, ClientAccountControllerView clientAccountControllerView) throws Exception{
+    public void addTickets(List<Ticket> tickets, ClientAccountControllerView clientAccountControllerView) {
         List<Ticket> ticketsWithNullSession = new ArrayList<>();
         for (Ticket ticket : tickets) {
             try {
@@ -109,13 +114,5 @@ public class ClientAccountApplication extends Application implements ClientAccou
                 ticketsWithNullSession.add(ticket);
             }
         }
-
-//        if (!ticketsWithNullSession.isEmpty()) {
-////            clientAccountControllerView.showDeletedSessionsAlert();
-////            for (Ticket ticket : ticketsWithNullSession) {
-////                ticketDAO.deleteTicket(ticket.getId());
-////            }
-////        }
-
     }
 }

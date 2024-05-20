@@ -100,7 +100,7 @@ public class SpecialViewableViewController {
 
     public void fillMovieChoice() throws SQLException {
         movieChoice.getItems().clear();
-        moviesTitleToChoose = listener.displayAllMovie();
+        moviesTitleToChoose = listener.displayAllMovies();
         for (String title : moviesTitleToChoose) {
             movieChoice.getItems().add(title);
         }
@@ -214,7 +214,7 @@ public class SpecialViewableViewController {
 
         void onRemoveMovieButtonClick();
 
-        ArrayList<String> displayAllMovie() throws SQLException;
+        ArrayList<String> displayAllMovies() throws SQLException;
 
         void onMovieChoising(int selectedIndex);
 

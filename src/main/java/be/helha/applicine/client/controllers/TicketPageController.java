@@ -26,6 +26,10 @@ public class TicketPageController extends Application implements TicketShoppingV
 
     private ServerRequestHandler serverRequestHandler;
 
+    /**
+     * Starts the TicketPageController. Get the sessions for the movie and display them in the view.
+     * @param stage the stage to display the view in.
+     */
     public void start(Stage stage) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(TicketShoppingViewController.class.getResource("TicketShoppingView.fxml"));
@@ -50,14 +54,17 @@ public class TicketPageController extends Application implements TicketShoppingV
                 controller.setSessions(sessions);
             }
         } catch (IOException e) {
-            AlertViewController.showErrorMessage("Error loading ticket shopping view: " + e.getMessage());
+            AlertViewController.showErrorMessage("Erreur lors de l'affichage de vos tickets : " + e.getMessage());
         } catch (SQLException e) {
-            AlertViewController.showErrorMessage("Error getting sessions for movie: " + e.getMessage());
-            parentController.closeAllWindows();
+            AlertViewController.showErrorMessage("Erreur lors de la connection à la base de donnée : " + e.getMessage());
             parentController.toClient();
         }
     }
 
+    /**
+     * Constructor for the TicketPageController class.
+     * @param masterApplication the parent controller (MasterApplication).
+     */
     public TicketPageController(MasterApplication masterApplication) {
         this.parentController = masterApplication;
         Session currentSession = parentController.getSession();
@@ -65,6 +72,11 @@ public class TicketPageController extends Application implements TicketShoppingV
         this.clientID = client.getId();
     }
 
+    /**
+     * Creates x tickets for the selected session.
+     * @param numberOfTickets the number of tickets to create.
+     * @param ticketType the type of ticket to create.
+     */
     public void createTickets(int numberOfTickets, String ticketType) {
         for (int i = 0; i < numberOfTickets; i++) {
             Session currentSession = parentController.getSession();
@@ -80,6 +92,14 @@ public class TicketPageController extends Application implements TicketShoppingV
         }
     }
 
+    /**
+     * Creates tickets for the selected session based on the number of tickets and the type of the ticket.
+     * @param sessionId the ID of the selected session.
+     * @param normalTickets the number of normal tickets to create.
+     * @param seniorTickets the number of senior tickets to create.
+     * @param minorTickets the number of minor tickets to create.
+     * @param studentTickets the number of student tickets to create.
+     */
     @Override
     public void buyTickets(String sessionId, int normalTickets, int seniorTickets, int minorTickets, int studentTickets) {
         onSessionSelected(sessionId); //Session jamais null sinon le prog plante dans la vue déjà ==> supp fonction??
@@ -93,6 +113,10 @@ public class TicketPageController extends Application implements TicketShoppingV
         createTickets(studentTickets, "student");
     }
 
+    /**
+     * Gets the session with the given ID.
+     * @param sessionId the ID of the session to get.
+     */
     @Override
     public void onSessionSelected(String sessionId) {
         // Assume sessionId is a valid integer string that represents the ID of the session
@@ -101,20 +125,32 @@ public class TicketPageController extends Application implements TicketShoppingV
             GetSessionByIdRequest request = new GetSessionByIdRequest(id);
             selectedSession = serverRequestHandler.sendRequest(request);
         } catch (NumberFormatException e) {
-            System.out.println("Invalid session ID: " + sessionId);
+            AlertViewController.showInfoMessage("Invalid session ID: " + sessionId);
         }
     }
 
+    /**
+     * Sets the movie to display in the view.
+     * @param viewable the movie to display.
+     */
     public void setViewable(Viewable viewable) {
         this.viewable = viewable;
     }
 
+    /**
+     * Redirects the user to the client page.
+     */
     public void closeWindow() {
         parentController.toClient();
+
     }
 
+    /**
+     * Gets the sessions for the given movie.
+     * @param movie the movie to get the sessions for.
+     * @return a list of sessions for the movie.
+     */
     public List<MovieSession> getSessionsForMovie(Viewable movie) throws SQLException {
-        System.out.println("Getting sessions for movie: " + movie.getId());
         GetSessionByMovieId request = new GetSessionByMovieId(movie.getId());
         try {
             return serverRequestHandler.sendRequest(request);

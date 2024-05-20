@@ -13,12 +13,22 @@ public class ServerRequestHandler {
     private ObjectOutputStream out;
     private ObjectInputStream in;
 
+    /**
+     * (Singleton) Constructor for the ServerRequestHandler class.
+     * @throws IOException if an I/O error occurs when creating the socket.
+     */
     private ServerRequestHandler() throws IOException {
         clientSocket = new Socket(ServerConstants.HOST, ServerConstants.PORT);
         out = new ObjectOutputStream(clientSocket.getOutputStream());
         in = new ObjectInputStream(clientSocket.getInputStream());
     }
 
+    /**
+     * Sends a request to the server.
+     * @param request the request to send to the server.
+     * @param <T> the type of the response.
+     * @return the response from the server.
+     */
     public <T> T sendRequest(Object request) {
         try {
             out.writeObject(request);
@@ -29,6 +39,11 @@ public class ServerRequestHandler {
 
         }
     }
+
+    /**
+     * @return the instance of the ServerRequestHandler class.
+     * @throws IOException if an I/O error occurs when creating the socket.
+     */
     public static ServerRequestHandler getInstance() throws IOException {
         if (instance == null) {
             instance = new ServerRequestHandler();
@@ -36,6 +51,10 @@ public class ServerRequestHandler {
         return instance;
     }
 
+    /**
+     * Closes the input and output streams and the client socket.
+     * @throws IOException if an I/O error occurs when closing the streams or the socket.
+     */
     public void close() throws IOException {
         in.close();
         out.close();

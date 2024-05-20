@@ -11,6 +11,8 @@ import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+
+import java.io.IOException;
 import java.net.URL;
 
 
@@ -44,7 +46,7 @@ public class ClientAccountControllerView {
     }
 
     //utilisée pour initialiser et afficher une nouvelle fenêtre (ou "stage") dans une application JavaFX
-    public static void setStageOf(FXMLLoader fxmlLoader, ClientAccountListener listener) throws Exception{
+    public static void setStageOf(FXMLLoader fxmlLoader, ClientAccountListener listener) throws IOException {
         accountWindow = new Stage(); //crée une nouvelle fenêtre
         accountWindow.setOnCloseRequest(event -> {
             try {

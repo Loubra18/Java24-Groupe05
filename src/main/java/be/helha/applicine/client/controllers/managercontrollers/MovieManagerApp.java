@@ -86,25 +86,18 @@ public class MovieManagerApp extends ManagerController implements MovieManagerVi
      */
     @Override
     public void onValidateButtonClick(int movieID, String title, String genre, String director, String duration, String synopsis, byte[] image, String editType) throws SQLException {
-        System.out.println("avant le trycatch Le chemin de l'image est " + image);
 
         try {
             validateFields(title, genre, director, duration, synopsis, image);
-        } catch (InvalideFieldsExceptions e) {
-            AlertViewController.showErrorMessage("Champs invalides" + e.getMessage());
-            return;
-        }
-        Movie movie = null;
-        ClientEvent clientEvent = null;
-        if (editType.equals("add")) {
-            movie = new Movie(title, genre, director, Integer.parseInt(duration), synopsis, image, null);
-            clientEvent = new CreateMovieRequest(movie);
-        } else if (editType.equals("modify")) {
-            movie = (Movie) createMovieWithRawData(movieID, title, genre, director, duration, synopsis, image);
-            clientEvent = new UpdateMovieRequest(movie);
-        }
-
-        try {
+            Movie movie = null;
+            ClientEvent clientEvent = null;
+            if (editType.equals("add")) {
+                movie = new Movie(title, genre, director, Integer.parseInt(duration), synopsis, image, null);
+                clientEvent = new CreateMovieRequest(movie);
+            } else if (editType.equals("modify")) {
+                movie = (Movie) createMovieWithRawData(movieID, title, genre, director, duration, synopsis, image);
+                clientEvent = new UpdateMovieRequest(movie);
+            }
             Object response = serverRequestHandler.sendRequest(clientEvent);
             if (response instanceof String) {
                 if (response.equals("MOVIE_ADDED")) {
@@ -120,6 +113,8 @@ public class MovieManagerApp extends ManagerController implements MovieManagerVi
                 }
             }
         } catch (IOException | ClassNotFoundException e) {
+
+        } catch (InvalideFieldsExceptions e) {
             throw new RuntimeException(e);
         }
 
