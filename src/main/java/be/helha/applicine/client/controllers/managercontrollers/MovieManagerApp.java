@@ -179,7 +179,6 @@ public class MovieManagerApp extends ManagerController implements MovieManagerVi
             //Affiche une alerte de confirmation pour la suppression
             boolean confirmed = AlertViewController.showConfirmationMessage("Voulez-vous vraiment supprimer ce film ?");
             if (confirmed) {
-
                 int sessionLinkedToMovie = serverRequestHandler.sendRequest(new GetSessionsLinkedToMovieRequest(movieId));
                 int sagasLinkedToMovie = serverRequestHandler.sendRequest(new GetSagasLinkedToMovieRequest(movieId));
                 System.out.println(sessionLinkedToMovie);
@@ -189,23 +188,20 @@ public class MovieManagerApp extends ManagerController implements MovieManagerVi
                         return;
                     }
                 }
-
                 if (sagasLinkedToMovie > 0) {
                     AlertViewController.showErrorMessage("Impossible de supprimer ce film car il est lié à des sagas");
                     return;
                 }
 
-//                movieDAO.deleteRattachedSessions(movieId);
                 serverRequestHandler.sendRequest(new DeleteMoviesRequest(movieId));
 
-//                movieDAO.removeMovie(movieId);
                 movieList = serverRequestHandler.sendRequest(new GetMoviesRequest());
                 this.refreshMovieManager();
                 movieManagerViewController.deletionConfirmed();
                 notifyListeners();
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            AlertViewController.showErrorMessage("Le film n'a pas pu être supprimé");
         }
     }
 

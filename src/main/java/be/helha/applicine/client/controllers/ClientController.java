@@ -53,6 +53,10 @@ public class ClientController extends Application implements ClientViewControlle
         }
     }
 
+    /**
+     * Get the movies from the server.
+     * @return The list of movies.
+     */
     private List<Viewable> getMovies() {
         GetViewablesRequest request = new GetViewablesRequest();
         return serverRequestHandler.sendRequest(request);
@@ -60,13 +64,16 @@ public class ClientController extends Application implements ClientViewControlle
 
     /**
      * Add movies to the client view.
-     *
      * @param controller The controller of the client view.
      * @param movies The list of movies to add.
      */
     public void addMovies(ClientViewController controller, List<Viewable> movies) {
-        for (Viewable movie : movies) {
-            controller.addMovie(movie, this);
+        try {
+            for (Viewable movie : movies) {
+                controller.addMovie(movie, this);
+            }
+        } catch (IOException e) {
+            AlertViewController.showErrorMessage("Erreur lors de l'ajout des films: " + e.getMessage());
         }
     }
 

@@ -6,6 +6,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
@@ -15,8 +16,9 @@ import javafx.stage.Window;
 import java.io.IOException;
 import java.net.URL;
 
-
-
+/**
+ * Classe qui gère la vue de la page du compte client, affiche les tickets du client et permet de retourner à la page client.
+ */
 public class ClientAccountControllerView {
 
     @FXML
@@ -33,19 +35,36 @@ public class ClientAccountControllerView {
     @FXML
     private ListView<HBox> ticketContainer;
 
+    /**
+     * Permet de définir le listener de la page du compte client.
+     * @param listener le listener de la page du compte client.
+     */
     public void setListener(ClientAccountListener listener) {
         this.listener = listener;
     }
 
+    /**
+     * Permet de récupérer la fenêtre de la page du compte client.
+     * @return la fenêtre de la page du compte client.
+     */
     public Window getAccountWindow() {
         return accountWindow;
     }
 
+    /**
+     * Permet de récupérer l'URL du fichier FXML de la page du compte client.
+     * @return l'URL du fichier FXML de la page du compte client.
+     */
     public static URL getFXMLResource() {
         return ClientAccountControllerView.class.getResource("ClientAccount.fxml");
     }
 
-    //utilisée pour initialiser et afficher une nouvelle fenêtre (ou "stage") dans une application JavaFX
+    /**
+     * Permet de définir la fenêtre de la page du compte client et de créer une nouvelle scène pour la page du compte client.
+     * @param fxmlLoader le chargeur FXML de la page du compte client.
+     * @param listener le listener de la page du compte client.
+     * @throws IOException si une erreur survient lors de la création de la fenêtre de la page du compte client.
+     */
     public static void setStageOf(FXMLLoader fxmlLoader, ClientAccountListener listener) throws IOException {
         accountWindow = new Stage(); //crée une nouvelle fenêtre
         accountWindow.setOnCloseRequest(event -> {
@@ -61,12 +80,21 @@ public class ClientAccountControllerView {
         accountWindow.setTitle("Client Account"); //définit le titre de la fenêtre
         accountWindow.show();
     }
+
+    /**
+     * Gère l'événement du clic sur le bouton "Retour" de la page du compte client.
+     * @param actionEvent le listener de la page du compte client.
+     */
     public void onCloseButtonClicked(ActionEvent actionEvent) {
-        //TO DO j'informe le client que ses modifications ne seront pas enregistrées
         listener.toClientSide();
     }
 
-    public void addTicket(Ticket ticket) throws Exception{
+    /**
+     * Permet d'ajouter un ticket à la liste des tickets du client.
+     * @param ticket le ticket à ajouter.
+     * @throws IOException relève une erreur survient lors de l'ajout du ticket.
+     */
+    public void addTicket(Ticket ticket) throws IOException{
         FXMLLoader ticketPane = new FXMLLoader(TicketPaneViewController.getFXMLResource());
         System.out.println("ticketPane: " + ticketPane);
         HBox pane = ticketPane.load();
@@ -76,30 +104,36 @@ public class ClientAccountControllerView {
         ticketContainer.getItems().add(new HBox(pane));
     }
 
+    /**
+     * Permet de remplir les labels de la page du compte client.
+     * @param client le client dont les informations doivent être affichées.
+     */
     public void fillLabels(Client client) {
         LabelNom.setText(client.getName());
         LabelEmail.setText(client.getEmail());
         LabelPseudo.setText(client.getUsername());
     }
 
+    /**
+     * Permet d'initialiser la page du compte client.
+     * @param client le client dont les informations doivent être affichées.
+     */
     public void initializeClientAccountPage(Client client) {
-        try {
-            fillLabels(client);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        fillLabels(client);
     }
 
+    /**
+     * Interface qui définit les méthodes du listener de la page du compte client.
+     * Permet de retourner à la fenêtre du client, de retourner à la page du compte client et de récupérer le client du compte.
+     */
     public interface ClientAccountListener {
 
         //je retourne à la fenêtre du client
         void toClientSide();
 
-        void toClientAccount() throws Exception;
+        void toClientAccount();
 
-        Client getClientAccount() throws Exception;
+        Client getClientAccount();
     }
-
-
 }
 

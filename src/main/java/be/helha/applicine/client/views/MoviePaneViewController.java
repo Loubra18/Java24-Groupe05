@@ -36,32 +36,25 @@ public class MoviePaneViewController {
     @FXML
     public ScrollPane movieInfoScrollPane;
     public AnchorPane anchorPane;
-    /**
-     * The root of the movie pane.
-     */
+
     @FXML
     private VBox root;
-    /**
-     * The image view of the movie pane.
-     */
     @FXML
     private ImageView imageView;
-    /**
-     * The title label of the movie pane.
-     */
     @FXML
     public Label titleLabel;
-
     @FXML
     public Button leftButton;
-
     @FXML
     public Button rightButton;
-
     @FXML
     private Label sagaLabel;
     private MoviePaneViewListener listener;
 
+    /**
+     * Sets the listener for the movie pane.
+     * @param listener the listener to set.
+     */
     public void setListener(MoviePaneViewListener listener) {
         this.listener = listener;
     }
@@ -72,16 +65,16 @@ public class MoviePaneViewController {
 
     private int currentMovieIndex = 0;
 
+    /**
+     * Gets the FXML resource of the movie pane.
+     * @return the FXML resource of the movie pane.
+     */
     public static URL getFXMLResource() {
         return MoviePaneViewController.class.getResource("/be/helha/applicine/client/views/components/MoviePane.fxml");
     }
 
-    public void initialize() {
-    }
-
     /**
      * Sets the movie of the movie pane.
-     *
      * @param movie the movie to set.
      */
     public void setMovie(Viewable movie) {
@@ -103,28 +96,32 @@ public class MoviePaneViewController {
             leftButton.setVisible(true);
             rightButton.setVisible(true);
         }
-        else {
-            throw new IllegalArgumentException("The movie must be an instance of Viewable.");
-        }
     }
 
     /**
      * Gets the root of the movie pane.
-     *
      * @return the root of the movie pane.
      */
     public Pane getRoot() {
         return root;
     }
 
+    /**
+     * Handles the left button.
+     * @param actionEvent the action event.
+     */
     public void toBuyTicketPage(ActionEvent actionEvent) {
         try {
             listener.onBuyTicketClicked(movie);
         } catch (Exception e) {
-            e.printStackTrace();
+            AlertViewController.showErrorMessage("Erreur lors de l'achat du ticket. Veuillez redémarrer l'application.");
         }
     }
 
+    /**
+     * Handles the more info button.
+     * @param mouseEvent the mouse event.
+     */
     public void moreInfoHandling(MouseEvent mouseEvent) {
         imageView.setFitHeight(imageView.getFitHeight() / 3);
         imageVbox.setAlignment(Pos.TOP_CENTER);
@@ -140,6 +137,10 @@ public class MoviePaneViewController {
         infoMovie.setPrefHeight((double) size / 2);
     }
 
+    /**
+     * Handles the less info button.
+     * @param mouseEvent the mouse event.
+     */
     public void lessInfoHandling(MouseEvent mouseEvent) {
         imageView.setFitHeight(imageView.getFitHeight() * 3);
         imageVbox.setAlignment(Pos.TOP_CENTER);
@@ -150,6 +151,11 @@ public class MoviePaneViewController {
         infoMovie.setPrefHeight(0);
     }
 
+    /**
+     * Counts the number of lines of a label.
+     * @param label the label.
+     * @return the number of lines of the label.
+     */
     public int countLines(Label label) {
         anchorPane.setPrefHeight(1000);
         label.setPrefHeight(1000);
@@ -161,27 +167,10 @@ public class MoviePaneViewController {
         return (int) Math.ceil(text.length() / charactersPerLine);
     }
 
-    public void showNextMovie(ActionEvent actionEvent) {
-        sagaLabel.setVisible(true);
-        currentMovieIndex++;
-        if (currentMovieIndex == movies.size()) {
-            currentMovieIndex = 0;
-        }
-        imageView.setImage(new Image(new ByteArrayInputStream(movies.get(currentMovieIndex).getImage())));
-    }
-
-    public void showPreviousMovie(ActionEvent actionEvent) {
-        sagaLabel.setVisible(true);
-        currentMovieIndex--;
-        if (currentMovieIndex < 0) {
-            currentMovieIndex = movies.size() - 1;
-        }
-        imageView.setImage(new Image(new ByteArrayInputStream(movies.get(currentMovieIndex).getImage())));
-    }
-
+    /**
+     * Listener for the movie pane view.
+     */
     public interface MoviePaneViewListener {
         void onBuyTicketClicked(Viewable movie) throws Exception;
     }
-
-
 }

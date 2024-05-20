@@ -14,31 +14,19 @@ import java.net.URL;
 
 /**
  * This class is the controller for the login view.
+ * It handles the user input and sends it to the listener.
  */
 public class LoginViewController {
-    /**
-     * The username text field.
-     */
+
     @FXML
     private TextField username;
-    /**
-     * The password field.
-     */
     @FXML
     private PasswordField password;
-    /**
-     * The error label.
-     */
     @FXML
     private Label emptyErrorLabel;
-    /**
-     * The listener for the login view.
-     */
     private LoginViewListener listener;
-    /**
-     * The stage of the login view.
-     */
     private static Stage stage;
+
     /**
      * Gets the stage of the login view.
      * @return the stage of the login view.
@@ -46,6 +34,7 @@ public class LoginViewController {
     public static Window getStage() {
         return stage;
     }
+
     /**
      * Sets the listener for the login view.
      * @param listener the listener for the login view.
@@ -53,12 +42,7 @@ public class LoginViewController {
     public void setListener(LoginViewListener listener){
         this.listener = listener;
     }
-    /**
-     * Initializes the login view.
-     */
-    public void initialize(){
-        System.out.println("Hello World");
-    }
+
     /**
      * Sets the stage of the login view.
      * @param fxmlLoader the fxml loader.
@@ -71,11 +55,11 @@ public class LoginViewController {
         stage.setScene(scene);
         stage.show();
     }
+
     /**
-     * Checks the login.
-     * @throws Exception if an error occurs.
+     * Checks if login successful.
      */
-    public void checkLogin() throws Exception {
+    public void checkLogin() {
         boolean loginSuccessful = listener.inputHandling(username.getText(), password.getText());
         if(loginSuccessful){
             System.out.println("Login successful");
@@ -83,22 +67,21 @@ public class LoginViewController {
             emptyErrorLabel.setText("Incorrect username or password");
         }
     }
+
+    /**
+     * Goes to the registration view, to create a new account.
+     */
     @FXML
     public void toRegistration() {
         listener.toRegistration();
     }
 
+    /**
+     * Goes back to the client view without logging in.
+     */
     @FXML
     public void goBackWithoutLogin() throws Exception {
         listener.toClientWithoutLogin();
-    }
-
-    public void showError(String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 
     /**
@@ -109,6 +92,7 @@ public class LoginViewController {
         void toRegistration();
         void toClientWithoutLogin();
     }
+
     /**
      * Gets the FXML resource.
      * @return the FXML resource.

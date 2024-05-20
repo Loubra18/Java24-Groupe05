@@ -110,7 +110,7 @@ public class ClientAccountApplication extends Application implements ClientAccou
         for (Ticket ticket : tickets) {
             try {
                 clientAccountControllerView.addTicket(ticket);
-            }catch (Exception e){
+            }catch (IOException e){
                 ticketsWithNullSession.add(ticket);
             }
         }

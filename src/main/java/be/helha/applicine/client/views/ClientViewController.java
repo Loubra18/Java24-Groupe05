@@ -15,7 +15,10 @@ import javafx.stage.Window;
 import java.io.IOException;
 import java.net.URL;
 
-
+/**
+ * This class is the controller of the client interface.
+ * It will be used to display the movies in the database, listen to the events in the interface and update the interface, and to display the account information.
+ */
 public class ClientViewController {
     @FXML
     private Button loginButton;
@@ -28,19 +31,26 @@ public class ClientViewController {
     private ClientViewListener listener;
     private static Stage clientWindow;
 
+    /**
+     * This method returns the stage of the client interface.
+     * @return clientWindow the stage of the client interface.
+     */
     public Stage getStage() {
         return clientWindow;
     }
 
+    /**
+     * This method sets the listener of the client interface.
+     * @param listener the listener of the client interface.
+     */
     public void setListener(ClientViewListener listener) {
         this.listener = listener;
     }
 
     /**
      * This method sets the stage of the client interface.
-     *
-     * @param fxmlLoader
-     * @throws IOException
+     * @param fxmlLoader the fxmlLoader of the client interface.
+     * @throws IOException if the fxmlLoader cannot be loaded.
      */
     public static void setStageOf(FXMLLoader fxmlLoader) throws IOException {
         clientWindow = new Stage();
@@ -54,32 +64,37 @@ public class ClientViewController {
      * This method displays the movies in the database.
      * We get the MoviePane fxml file and set the movie in the controller.
      * We then add the pane to the filmsContainer.
+     * @param movie the movie to be displayed.
+     * @param clientController the controller of the client interface.
      */
-    public void addMovie(Viewable movie, ClientController clientController) {
-        try {
-            FXMLLoader moviePane = new FXMLLoader(MoviePaneViewController.getFXMLResource());
-            Pane pane = moviePane.load();
-            MoviePaneViewController controller = moviePane.getController();
-            controller.setMovie(movie);
-            controller.setListener(clientController);
-            filmsContainer.getChildren().add(pane);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void addMovie(Viewable movie, ClientController clientController) throws IOException {
+        FXMLLoader moviePane = new FXMLLoader(MoviePaneViewController.getFXMLResource());
+        Pane pane = moviePane.load();
+        MoviePaneViewController controller = moviePane.getController();
+        controller.setMovie(movie);
+        controller.setListener(clientController);
+        filmsContainer.getChildren().add(pane);
     }
 
+    /**
+     * This method will be called when the user clicks on the login button. And redirect the user to the login page.
+     */
     @FXML
     public void toLoginPage() throws Exception {
         listener.toLoginPage();
     }
 
-    //servira à afficher les informations du compte en faisant pop up une nouvelle fenêtre
-
+    /**
+     * This method will be called when the user clicks on the account button, creating a pop-up window with the account information.
+     */
     public void toClientAccount() throws Exception {
         System.out.println("Account button clicked, je vais afficher les informations du compte");
         listener.toClientAccount();
     }
 
+    /**
+     * Updates the text of the login button depending on whether the user is logged in or not.
+     */
     public void updateButtonText(boolean isLogged) {
         if (isLogged) {
             loginButton.setText("Se déconnecter");
@@ -90,6 +105,9 @@ public class ClientViewController {
         }
     }
 
+    /**
+     * This method will be called when the user is not logged in and tries to buy tickets.
+     */
     public void showNotLoggedInAlert() {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle("Erreur de connexion");
@@ -111,7 +129,6 @@ public class ClientViewController {
 
     /**
      * This method returns the URL of the fxml file of the client interface.
-     *
      * @return clientSide.fxml
      */
     public static URL getFXMLResource() {
