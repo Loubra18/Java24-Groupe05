@@ -3,7 +3,6 @@ package be.helha.applicine.client.controllers;
 import be.helha.applicine.client.views.AlertViewController;
 import be.helha.applicine.client.controllers.managercontrollers.ManagerController;
 import be.helha.applicine.common.models.Session;
-import be.helha.applicine.common.models.request.ClientEvent;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -77,7 +76,7 @@ public class MasterApplication extends Application {
             }
             ClientController clientController = new ClientController(this);
             clientController.start(new Stage());
-        } catch (Exception e) {
+        } catch (Exception e){
             AlertViewController.showErrorMessage("Erreur lors de l'ouverture de la fenêtre client, veuillez réessayer plus tard.");
             toLogin();
         }
@@ -134,15 +133,6 @@ public class MasterApplication extends Application {
 
     public Session getSession() {
         return session;
-    }
-
-    public void closeCurrentWindow() {
-        currentWindow.hide();
-    }
-
-    public void toTicketPage() {
-        TicketPageController ticketPageController = new TicketPageController(this);
-        ticketPageController.start(new Stage());
     }
 }
 

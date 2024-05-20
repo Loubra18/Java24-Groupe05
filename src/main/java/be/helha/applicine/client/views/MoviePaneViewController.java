@@ -19,7 +19,6 @@ import javafx.scene.text.Text;
 import java.io.ByteArrayInputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Controller for the movie pane.
@@ -77,7 +76,7 @@ public class MoviePaneViewController {
      * Sets the movie of the movie pane.
      * @param movie the movie to set.
      */
-    public void setMovie(Viewable movie) {
+    public void setMovie(Viewable movie) throws IllegalArgumentException {
         if (movie instanceof Movie) {
             System.out.println("Viewable");
             this.movie = movie;
@@ -96,20 +95,20 @@ public class MoviePaneViewController {
             leftButton.setVisible(true);
             rightButton.setVisible(true);
         }
+        else {
+            throw new IllegalArgumentException("The movie must be an instance of Viewable.");
+        }
     }
 
     /**
      * Gets the root of the movie pane.
+     *
      * @return the root of the movie pane.
      */
     public Pane getRoot() {
         return root;
     }
 
-    /**
-     * Handles the left button.
-     * @param actionEvent the action event.
-     */
     public void toBuyTicketPage(ActionEvent actionEvent) {
         try {
             listener.onBuyTicketClicked(movie);
@@ -168,9 +167,34 @@ public class MoviePaneViewController {
     }
 
     /**
-     * Listener for the movie pane view.
+     * Shows the next movie of the saga
+     * @param actionEvent the action event.
      */
+    public void showNextMovie(ActionEvent actionEvent) {
+        sagaLabel.setVisible(true);
+        currentMovieIndex++;
+        if (currentMovieIndex == movies.size()) {
+            currentMovieIndex = 0;
+        }
+        imageView.setImage(new Image(new ByteArrayInputStream(movies.get(currentMovieIndex).getImage())));
+    }
+
+    /**
+     * Shows the previous movie of the saga.
+     * @param actionEvent the action event.
+     */
+    public void showPreviousMovie(ActionEvent actionEvent) {
+        sagaLabel.setVisible(true);
+        currentMovieIndex--;
+        if (currentMovieIndex < 0) {
+            currentMovieIndex = movies.size() - 1;
+        }
+        imageView.setImage(new Image(new ByteArrayInputStream(movies.get(currentMovieIndex).getImage())));
+    }
+
     public interface MoviePaneViewListener {
         void onBuyTicketClicked(Viewable movie) throws Exception;
     }
+
+
 }

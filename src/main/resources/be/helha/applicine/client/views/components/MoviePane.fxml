@@ -15,11 +15,13 @@
             <Insets bottom="10.0" />
         </VBox.margin>
         <HBox alignment="CENTER">
+            <Button fx:id="leftButton" onAction="#showPreviousMovie" text="&lt;&lt;" visible="false"/>
             <ImageView fx:id="imageView" fitHeight="300.0" fitWidth="248.0" pickOnBounds="true" preserveRatio="true">
                 <HBox.margin>
                     <Insets left="10.0" right="10.0" top="10.0" />
                 </HBox.margin>
             </ImageView>
+            <Button fx:id="rightButton" onAction="#showNextMovie" text="&gt;&gt;" visible="false" />
         </HBox>
         <Label fx:id="titleLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="74.0" prefWidth="248.0" text="Label" textAlignment="JUSTIFY" textFill="WHITE" wrapText="true" />
         <ScrollPane fx:id="movieInfoScrollPane" hbarPolicy="NEVER" maxWidth="242.0" prefHeight="40.0" prefWidth="242.0" style="-fx-background-color: black;">
