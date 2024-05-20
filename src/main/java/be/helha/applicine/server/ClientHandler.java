@@ -205,12 +205,16 @@ public class ClientHandler extends Thread implements RequestVisitor {
     @Override
     public void visit(ClientRegistrationRequest clientRegistrationRequest) throws IOException {
         Client client = clientRegistrationRequest.getClient();
-        String hashedPassword = HashedPassword.getHashedPassword(client.getPassword());
-        Client registeredClient = clientsDAO.create(new Client(client.getName(), client.getEmail(), client.getUsername(), hashedPassword));
-        if (registeredClient != null) {
-            out.writeObject("Registration successful");
-        } else {
-            out.writeObject("Registration failed");
+        try {
+            String hashedPassword = HashedPassword.getHashedPassword(client.getPassword());
+            Client registeredClient = clientsDAO.create(new Client(client.getName(), client.getEmail(), client.getUsername(), hashedPassword));
+            if (registeredClient != null) {
+                out.writeObject("Registration successful");
+            } else {
+                out.writeObject("Registration failed");
+            }
+        } catch (IOException e) {
+            out.writeObject("Error during registration: " + e.getMessage());
         }
     }
 

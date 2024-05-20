@@ -15,6 +15,9 @@ public class HashedPassword {
      * @throws IOException If an error occurs while hashing the password
      */
     public static String getHashedPassword(String password) throws IOException {
+        if (password == null || password.isEmpty()) {
+            throw new IllegalArgumentException("Password cannot be null or empty");
+        }
         try {
             return BCrypt.hashpw(password, BCrypt.gensalt());
         } catch (IllegalArgumentException e) {
@@ -30,6 +33,9 @@ public class HashedPassword {
      * @throws IllegalArgumentException If an error occurs while checking the password
      */
     public static boolean checkPassword(String password, String hashedPassword) {
+        if (password == null || hashedPassword == null) {
+            throw new IllegalArgumentException("Password and hashed password cannot be null");
+        }
         try {
             return BCrypt.checkpw(password, hashedPassword);
         } catch (IllegalArgumentException e) {
