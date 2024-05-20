@@ -114,13 +114,6 @@ public class ClientHandler extends Thread implements RequestVisitor {
         }
     }
 
-    public byte[] getImageAsBytes(String imagePath) throws IOException {
-        if (imagePath.startsWith("file:")) {
-            imagePath = imagePath.substring(5); // Remove the "file:" scheme
-        }
-        return Files.readAllBytes(Paths.get(imagePath));
-    }
-
 
     @Override
     public void visit(DeleteViewableRequest deleteViewableRequest) {
@@ -255,7 +248,7 @@ public class ClientHandler extends Thread implements RequestVisitor {
         try {
             List<Movie> movies = movieDAO.getAll();
             for (Viewable movie : movies) {
-                movie.setImage(getImageAsBytes(movie.getImagePath()));
+                movie.setImage(FileManager.getImageAsBytes(movie.getImagePath()));
             }
             out.writeObject(movies);
         } catch (IOException | SQLException e) {
@@ -298,7 +291,7 @@ public class ClientHandler extends Thread implements RequestVisitor {
         int id = getMovieByIdRequest.getMovieId();
         try {
             Movie movie = movieDAO.get(id);
-            movie.setImage(getImageAsBytes(movie.getImagePath()));
+            movie.setImage(FileManager.getImageAsBytes(movie.getImagePath()));
             out.writeObject(movie);
         } catch (IOException e) {
             throw new RuntimeException(e);

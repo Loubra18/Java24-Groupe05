@@ -8,3 +8,12 @@
     -fx-padding: 10px;
     -fx-text-alignment: center;
 }
+.saga-banner {
+    -fx-background-color: red;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-padding: 5px;
+    -fx-text-alignment: center;
+    -fx-max-width: infinity;
+    -fx-pref-width: 100%;
+}

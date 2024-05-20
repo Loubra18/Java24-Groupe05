@@ -1,11 +1,13 @@
 package be.helha.applicine.server.dao.impl;
 
+import be.helha.applicine.server.FileManager;
 import be.helha.applicine.server.dao.ViewableDAO;
 import be.helha.applicine.server.database.DatabaseConnection;
 import be.helha.applicine.common.models.Movie;
 import be.helha.applicine.common.models.Saga;
 import be.helha.applicine.common.models.Viewable;
 
+import java.io.IOException;
 import java.sql.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -171,7 +173,13 @@ public class ViewableDAOImpl implements ViewableDAO {
                     Movie refMovie = moviesForViewable.getFirst();
                     viewable = new Saga(rs.getInt("id"), rs.getString("name"), refMovie.getGenre(), refMovie.getDirector(), getTotalDurationFromMovies(moviesForViewable), "moviesForViewable", refMovie.getImage(), refMovie.getImagePath(), moviesForViewable);
                 }
-
+                if (viewable.getImage() == null) {
+                    try {
+                        viewable.setImage(FileManager.getImageAsBytes(viewable.getImagePath()));
+                    } catch (IOException e) {
+                        throw new RuntimeException("Error while getting image as bytes");
+                    }
+                }
                 array.add(viewable);
             }
         } catch (SQLException e) {

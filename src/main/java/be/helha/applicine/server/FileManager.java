@@ -48,4 +48,11 @@ public class FileManager {
             throw new RuntimeException(e);
         }
     }
+
+    public static byte[] getImageAsBytes(String imagePath) throws IOException {
+        if (imagePath.startsWith("file:")) {
+            imagePath = imagePath.substring(5); // Remove the "file:" scheme
+        }
+        return Files.readAllBytes(Paths.get(imagePath));
+    }
 }

@@ -6,6 +6,7 @@ import be.helha.applicine.common.models.Viewable;
 import be.helha.applicine.client.views.ClientViewController;
 import be.helha.applicine.client.views.MoviePaneViewController;
 import be.helha.applicine.common.models.request.GetMoviesRequest;
+import be.helha.applicine.common.models.request.GetViewablesRequest;
 import javafx.application.Application;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -54,7 +55,7 @@ public class ClientController extends Application implements ClientViewControlle
     }
 
     private List<Viewable> getMovies() {
-        GetMoviesRequest request = new GetMoviesRequest();
+        GetViewablesRequest request = new GetViewablesRequest();
         return serverRequestHandler.sendRequest(request);
     }
 

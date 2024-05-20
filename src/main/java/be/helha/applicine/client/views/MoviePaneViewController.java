@@ -1,5 +1,7 @@
 package be.helha.applicine.client.views;
 
+import be.helha.applicine.common.models.Movie;
+import be.helha.applicine.common.models.Saga;
 import be.helha.applicine.common.models.Viewable;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -16,6 +18,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import java.io.ByteArrayInputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Controller for the movie pane.
@@ -48,6 +52,14 @@ public class MoviePaneViewController {
     @FXML
     public Label titleLabel;
 
+    @FXML
+    public Button leftButton;
+
+    @FXML
+    public Button rightButton;
+
+    @FXML
+    private Label sagaLabel;
     private MoviePaneViewListener listener;
 
     public void setListener(MoviePaneViewListener listener) {
@@ -56,8 +68,15 @@ public class MoviePaneViewController {
 
     private Viewable movie;
 
+    private ArrayList<Movie> movies;
+
+    private int currentMovieIndex = 0;
+
     public static URL getFXMLResource() {
         return MoviePaneViewController.class.getResource("/be/helha/applicine/client/views/components/MoviePane.fxml");
+    }
+
+    public void initialize() {
     }
 
     /**
@@ -66,10 +85,27 @@ public class MoviePaneViewController {
      * @param movie the movie to set.
      */
     public void setMovie(Viewable movie) {
-        this.movie = movie;
-        titleLabel.setText(movie.getTitle());
-        imageView.setImage(new Image(new ByteArrayInputStream(movie.getImage())));
-        infoMovie.setText(movie.getSynopsis());
+        if (movie instanceof Movie) {
+            System.out.println("Viewable");
+            this.movie = movie;
+            titleLabel.setText(movie.getTitle());
+            imageView.setImage(new Image(new ByteArrayInputStream(movie.getImage())));
+            infoMovie.setText(movie.getSynopsis());
+        }
+        else if(movie instanceof Saga){
+            movies = ((Saga) movie).getMovies();
+            this.movie = movies.getFirst();
+            currentMovieIndex = 0;
+            sagaLabel.setVisible(true);
+            titleLabel.setText(movie.getTitle());
+            imageView.setImage(new Image(new ByteArrayInputStream(movie.getImage())));
+            infoMovie.setText(movie.getSynopsis());
+            leftButton.setVisible(true);
+            rightButton.setVisible(true);
+        }
+        else {
+            throw new IllegalArgumentException("The movie must be an instance of Viewable.");
+        }
     }
 
     /**
@@ -123,6 +159,24 @@ public class MoviePaneViewController {
         System.out.println(characterWidth);
         double charactersPerLine = Math.floor(labelWidth / characterWidth);
         return (int) Math.ceil(text.length() / charactersPerLine);
+    }
+
+    public void showNextMovie(ActionEvent actionEvent) {
+        sagaLabel.setVisible(true);
+        currentMovieIndex++;
+        if (currentMovieIndex == movies.size()) {
+            currentMovieIndex = 0;
+        }
+        setMovie(movies.get(currentMovieIndex));
+    }
+
+    public void showPreviousMovie(ActionEvent actionEvent) {
+        sagaLabel.setVisible(true);
+        currentMovieIndex--;
+        if (currentMovieIndex < 0) {
+            currentMovieIndex = movies.size() - 1;
+        }
+        setMovie(movies.get(currentMovieIndex));
     }
 
     public interface MoviePaneViewListener {

@@ -1,39 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<VBox fx:id="root" alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="492.0" prefWidth="247.0" stylesheets="@../CSS/MoviePane.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="be.helha.applicine.client.views.MoviePaneViewController">
-   <VBox fx:id="imageVbox" alignment="TOP_CENTER" prefHeight="452.0" prefWidth="248.0">
-      <VBox.margin>
-         <Insets bottom="10.0" />
-      </VBox.margin>
-      <ImageView fx:id="imageView" fitHeight="300.0" fitWidth="248.0" pickOnBounds="true" preserveRatio="true">
-         <VBox.margin>
-            <Insets top="20.0" />
-         </VBox.margin>
-      </ImageView>
-      <Label fx:id="titleLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="74.0" prefWidth="248.0" text="Label" textAlignment="JUSTIFY" textFill="WHITE" wrapText="true" />
-      <ScrollPane fx:id="movieInfoScrollPane" hbarPolicy="NEVER" maxWidth="242.0" prefHeight="40.0" prefWidth="242.0" style="-fx-background-color: black;">
-         <AnchorPane fx:id="anchorPane" minHeight="0.0" minWidth="0.0" prefHeight="38.0" prefWidth="238.0" style="-fx-background-color: black;">
-            <Label fx:id="infoMovie" alignment="TOP_LEFT" prefHeight="36.0" prefWidth="179.0" style="-fx-text-fill: white;" text="Label" wrapText="true" />
-         </AnchorPane>
-      </ScrollPane>
-      <Pane prefHeight="0.0" prefWidth="248.0">
-         <Button fx:id="moreInfoButton" mnemonicParsing="false" onMouseClicked="#moreInfoHandling" text="Plus d'infos" />
-         <Button fx:id="lessInfoButton" layoutX="160.0" mnemonicParsing="false" onMouseClicked="#lessInfoHandling" text="Moins d'infos" visible="false" />
-      </Pane>
-   </VBox>
-   <Button alignment="CENTER" mnemonicParsing="false" onAction="#toBuyTicketPage" prefHeight="27.0" prefWidth="133.0" style="-fx-background-color: gray;" text="Acheter des tickets" textAlignment="CENTER">
-      <font>
-         <Font name="Calibri" size="14.0" />
-      </font>
-   </Button>
+<VBox fx:id="root" alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="492.0" prefWidth="335.0" stylesheets="@../CSS/MoviePane.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="be.helha.applicine.client.views.MoviePaneViewController">
+    <HBox alignment="CENTER">
+        <Label fx:id="sagaLabel" alignment="CENTER" styleClass="saga-banner" text="SAGA" visible="false" HBox.hgrow="ALWAYS" />
+    </HBox>
+    <VBox fx:id="imageVbox" alignment="TOP_CENTER" prefHeight="452.0" prefWidth="346.0">
+        <VBox.margin>
+            <Insets bottom="10.0" />
+        </VBox.margin>
+        <HBox alignment="CENTER">
+            <Button fx:id="leftButton" onAction="#showPreviousMovie" text="&lt;&lt;" visible="false" />
+            <ImageView fx:id="imageView" fitHeight="300.0" fitWidth="248.0" pickOnBounds="true" preserveRatio="true">
+                <HBox.margin>
+                    <Insets left="10.0" right="10.0" top="10.0" />
+                </HBox.margin>
+            </ImageView>
+            <Button fx:id="rightButton" onAction="#showNextMovie" text="&gt;&gt;" visible="false" />
+        </HBox>
+        <Label fx:id="titleLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="74.0" prefWidth="248.0" text="Label" textAlignment="JUSTIFY" textFill="WHITE" wrapText="true" />
+        <ScrollPane fx:id="movieInfoScrollPane" hbarPolicy="NEVER" maxWidth="242.0" prefHeight="40.0" prefWidth="242.0" style="-fx-background-color: black;">
+            <AnchorPane fx:id="anchorPane" minHeight="0.0" minWidth="0.0" prefHeight="38.0" prefWidth="238.0" style="-fx-background-color: black;">
+                <Label fx:id="infoMovie" alignment="TOP_LEFT" prefHeight="36.0" prefWidth="179.0" style="-fx-text-fill: white;" text="Label" wrapText="true" />
+            </AnchorPane>
+        </ScrollPane>
+        <Pane prefHeight="0.0" prefWidth="248.0">
+            <Button fx:id="moreInfoButton" mnemonicParsing="false" onMouseClicked="#moreInfoHandling" text="Plus d'infos" />
+            <Button fx:id="lessInfoButton" layoutX="160.0" mnemonicParsing="false" onMouseClicked="#lessInfoHandling" text="Moins d'infos" visible="false" />
+        </Pane>
+    </VBox>
+    <Button alignment="CENTER" mnemonicParsing="false" onAction="#toBuyTicketPage" prefHeight="27.0" prefWidth="133.0" style="-fx-background-color: gray;" text="Acheter des tickets" textAlignment="CENTER">
+        <font>
+            <Font name="Calibri" size="14.0" />
+        </font>
+    </Button>
 </VBox>

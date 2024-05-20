@@ -1,9 +1,11 @@
 package be.helha.applicine.server.dao.impl;
 
+import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import be.helha.applicine.server.FileManager;
 import be.helha.applicine.server.dao.MovieDAO;
 import be.helha.applicine.server.dao.ViewableDAO;
 import be.helha.applicine.server.database.DatabaseConnection;
@@ -62,11 +64,16 @@ public class MovieDAOImpl implements MovieDAO {
     @Override
     public Movie get(int id) {
         try (PreparedStatement pstmt = connection.prepareStatement(SELECT_MOVIE_BY_ID)) {
+            Movie movie;
             pstmt.setInt(1, id);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    return new Movie(rs.getInt("id"), rs.getString("title"), rs.getString("genre"), rs.getString("director"), rs.getInt("duration"), rs.getString("synopsis"), null, rs.getString("imagePath"));
+                    movie = new Movie(rs.getInt("id"), rs.getString("title"), rs.getString("genre"), rs.getString("director"), rs.getInt("duration"), rs.getString("synopsis"), null, rs.getString("imagePath"));
+                    movie.setImage(FileManager.getImageAsBytes(movie.getImagePath()));
+                    return movie;
                 }
+            } catch (IOException e) {
+                System.out.println("Erreur lors de la récupération de l'image du film : " + e.getMessage());
             }
         } catch (SQLException e) {
             System.out.println("Erreur lors de la récupération du film : " + e.getMessage());
@@ -202,7 +209,7 @@ public class MovieDAOImpl implements MovieDAO {
      */
     @Override
     public void deleteRattachedSessions(int id) {
-        try (PreparedStatement pstmt = connection.prepareStatement("DELETE FROM seances WHERE movieid = ?")) {
+        try (PreparedStatement pstmt = connection.prepareStatement("DELETE FROM seances WHERE viewableid = ?")) {
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
         } catch (SQLException e) {
