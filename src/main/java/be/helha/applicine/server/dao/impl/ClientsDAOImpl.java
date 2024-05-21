@@ -29,11 +29,8 @@ public class ClientsDAOImpl implements ClientsDAO {
 
     /**
      * Create a client from the given parameters.
-     *
-     * @param name
-     * @param email
-     * @param username
-     * @param password
+     * The client is created in the database and returned.
+     * @param client the client to create.
      */
 
     @Override

@@ -22,13 +22,7 @@ public class TicketDAOImpl implements TicketDAO {
 
     /**
      * This method adds a ticket to the database.
-     *
-     * @param clientId The id of the client who bought the ticket.
-     * @param sessionId The id of the session the ticket is for.
-     * @param ticketType The type of the ticket (student, senior, normal).
-     * @param seatCode The code of the seat the ticket is for.
-     * @param price The price of the ticket.
-     * @param verificationCode The verification code of the ticket.
+     * @param ticket The ticket to add.
      */
 
     @Override

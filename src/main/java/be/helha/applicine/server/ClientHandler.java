@@ -118,7 +118,10 @@ public class ClientHandler extends Thread implements RequestVisitor {
         }
     }
 
-
+    /**
+     * Delete a viewable from the database.
+     * @param deleteViewableRequest The request to delete a viewable.
+     */
     @Override
     public void visit(DeleteViewableRequest deleteViewableRequest) {
         int viewableId = deleteViewableRequest.getViewableId();
@@ -320,5 +323,12 @@ public class ClientHandler extends Thread implements RequestVisitor {
         int sessionId = deleteSessionRequest.getSessionId();
         sessionDAO.delete(sessionId);
         out.writeObject("SESSION_DELETED");
+    }
+    public void notifyUser(String message) {
+        try {
+            out.writeObject("NOTIFY" + message);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
