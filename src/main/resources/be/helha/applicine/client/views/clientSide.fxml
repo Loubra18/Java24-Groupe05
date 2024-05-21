@@ -8,7 +8,10 @@
 <BorderPane fx:id="borderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="@CSS/clientStyle.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1">
     <center>
         <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true">
-            <FlowPane fx:id="filmsContainer" alignment="CENTER" prefHeight="100.0" prefWidth="200.0" />
+            <FlowPane fx:id="filmsContainer" alignment="CENTER" hgap="15.0" prefHeight="100.0" prefWidth="200.0" vgap="15.0">
+            <opaqueInsets>
+               <Insets />
+            </opaqueInsets></FlowPane>
         </ScrollPane>
     </center>
     <bottom>
@@ -24,8 +27,7 @@
     </padding>
     <top>
         <HBox alignment="CENTER" prefHeight="47.0" prefWidth="570.0" BorderPane.alignment="CENTER">
-            <Label alignment="CENTER" prefHeight="115.0" prefWidth="434.0" styleClass="label" text="Choisissez votre scéance : " textFill="WHITE"
-                   wrapText="true">
+            <Label alignment="CENTER" prefHeight="115.0" prefWidth="434.0" styleClass="label" text="Choisissez votre scéance : " textFill="WHITE" wrapText="true">
                 <font>
                     <Font name="System Bold" size="24.0" />
                 </font>
