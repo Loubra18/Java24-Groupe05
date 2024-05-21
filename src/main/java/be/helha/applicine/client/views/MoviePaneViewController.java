@@ -96,7 +96,7 @@ public class MoviePaneViewController {
             rightButton.setVisible(true);
         }
         else {
-            throw new IllegalArgumentException("The movie must be an instance of Viewable.");
+            throw new IllegalArgumentException("The movie must be an instance of Movie or Saga.");
         }
     }
 
