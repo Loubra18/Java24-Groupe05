@@ -7,6 +7,7 @@ import java.sql.SQLException;
 
 public class UpdateSessionRequest extends ClientEvent{
     private MovieSession session;
+    private boolean success;
 
     public MovieSession getSession() {
         return session;
@@ -16,6 +17,13 @@ public class UpdateSessionRequest extends ClientEvent{
         this.session = session;
     }
 
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    public boolean getSuccess() {
+        return success;
+    }
 
     @Override
     public void dispatchOn(RequestVisitor requestVisitor) throws IOException, SQLException {

@@ -4,6 +4,7 @@ import be.helha.applicine.common.models.MovieSession;
 
 public class AddSessionRequest extends ClientEvent {
     private MovieSession session;
+    private boolean success;
 
     public AddSessionRequest(MovieSession session) {
         this.session = session;
@@ -11,6 +12,14 @@ public class AddSessionRequest extends ClientEvent {
 
     public MovieSession getSession() {
         return session;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    public boolean getSuccess() {
+        return success;
     }
 
     @Override

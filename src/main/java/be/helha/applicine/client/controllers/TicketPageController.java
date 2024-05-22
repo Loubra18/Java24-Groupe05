@@ -83,7 +83,7 @@ public class TicketPageController extends Application implements TicketShoppingV
             Client client = currentSession.getCurrentClient();
             clientID = client.getId();
             Ticket ticket = new Ticket(ticketType,selectedSession,client);
-            Object response = serverRequestHandler.sendRequest(new CreateTicketRequest(ticket));
+            Object response = null;
             if (response.equals("TICKET_CREATED")) {
                 System.out.println("Ticket created successfully");
             } else {
@@ -123,7 +123,7 @@ public class TicketPageController extends Application implements TicketShoppingV
         try {
             int id = Integer.parseInt(sessionId);
             GetSessionByIdRequest request = new GetSessionByIdRequest(id);
-            selectedSession = serverRequestHandler.sendRequest(request);
+            selectedSession = null;
         } catch (NumberFormatException e) {
             AlertViewController.showInfoMessage("Invalid session ID: " + sessionId);
         }
@@ -153,7 +153,7 @@ public class TicketPageController extends Application implements TicketShoppingV
     public List<MovieSession> getSessionsForMovie(Viewable movie) throws SQLException {
         GetSessionByMovieId request = new GetSessionByMovieId(movie.getId());
         try {
-            return serverRequestHandler.sendRequest(request);
+            return null;
         } catch (Exception e) {
             System.out.println("Error getting sessions for movie: " + e.getMessage());
             return null;

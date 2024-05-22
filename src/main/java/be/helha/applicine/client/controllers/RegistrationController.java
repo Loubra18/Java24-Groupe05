@@ -51,7 +51,7 @@ public class RegistrationController extends Application implements RegistrationV
 
             Client client = new Client(name, email, username, password);
             ClientRegistrationRequest request = new ClientRegistrationRequest(client);
-            String response = serverRequestHandler.sendRequest(request);
+            String response = null;
 
             if (!"Registration successful".equals(response)) {
                 throw new Exception("Registration failed");

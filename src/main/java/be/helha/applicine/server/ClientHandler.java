@@ -54,8 +54,10 @@ public class ClientHandler extends Thread implements RequestVisitor {
     @Override
     public void visit(GetSagasLinkedToMovieRequest getSagasLinkedToMovieRequest) {
         int movieId = getSagasLinkedToMovieRequest.getMovieId();
+        int amountSagas = viewableDAO.sagasLinkedToMovie(movieId);
+        getSagasLinkedToMovieRequest.setAmountSagas(amountSagas);
         try {
-            out.writeObject(viewableDAO.sagasLinkedToMovie(movieId));
+            out.writeObject(getSagasLinkedToMovieRequest);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -70,7 +72,8 @@ public class ClientHandler extends Thread implements RequestVisitor {
                 FileManager.createImageFromBytes(movie.getImage(), movie.getImagePath());
             }
             movieDAO.update(movie);
-            out.writeObject("MOVIE_UPDATED");
+            updateMovieRequest.setStatus(true);
+            out.writeObject(updateMovieRequest);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -81,7 +84,8 @@ public class ClientHandler extends Thread implements RequestVisitor {
         int id = getRoomByIdRequest.getRoomId();
         try {
             Room room = roomDAO.get(id);
-            out.writeObject(room);
+            getRoomByIdRequest.setRoom(room);
+            out.writeObject(getRoomByIdRequest);
         } catch (IOException | SQLException e) {
             throw new RuntimeException(e);
         }
@@ -92,7 +96,8 @@ public class ClientHandler extends Thread implements RequestVisitor {
         MovieSession session = addSessionRequest.getSession();
         try {
             sessionDAO.create(session);
-            out.writeObject("SESSION_ADDED");
+            addSessionRequest.setSuccess(true);
+            out.writeObject(addSessionRequest);
         } catch (IOException | SQLException e) {
             throw new RuntimeException(e);
         }
@@ -103,7 +108,8 @@ public class ClientHandler extends Thread implements RequestVisitor {
         MovieSession session = updateSessionRequest.getSession();
         try {
             sessionDAO.update(session);
-            out.writeObject("SESSION_UPDATED");
+            updateSessionRequest.setSuccess(true);
+            out.writeObject(updateSessionRequest);
         } catch (IOException | SQLException e) {
             throw new RuntimeException(e);
         }
@@ -112,7 +118,8 @@ public class ClientHandler extends Thread implements RequestVisitor {
     @Override
     public void visit(GetRoomsRequest getRoomsRequest) {
         try {
-            out.writeObject(roomDAO.getAll());
+            getRoomsRequest.setRooms(roomDAO.getAll());
+            out.writeObject(getRoomsRequest);
         } catch (IOException | SQLException e) {
             throw new RuntimeException(e);
         }
@@ -124,13 +131,15 @@ public class ClientHandler extends Thread implements RequestVisitor {
         int viewableId = deleteViewableRequest.getViewableId();
         if (viewableDAO.removeViewable(viewableId)) {
             try {
-                out.writeObject("VIEWABLE_DELETED");
+                deleteViewableRequest.setSuccess(true);
+                out.writeObject(deleteViewableRequest);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         } else {
             try {
-                out.writeObject("VIEWABLE_NOT_DELETED");
+                deleteViewableRequest.setSuccess(false);
+                out.writeObject(deleteViewableRequest);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -140,7 +149,9 @@ public class ClientHandler extends Thread implements RequestVisitor {
     @Override
     public void visit(GetViewablesRequest getViewablesRequest) throws IOException {
         try {
-            out.writeObject(viewableDAO.getAllViewables());
+            List<Viewable> viewables = viewableDAO.getAllViewables();
+            getViewablesRequest.setViewables(viewables);
+            out.writeObject(getViewablesRequest);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -156,7 +167,8 @@ public class ClientHandler extends Thread implements RequestVisitor {
         }
         viewableDAO.addViewable(saga.getTitle(), "Saga", ids);
         try {
-            out.writeObject("VIEWABLE_ADDED");
+            addViewableRequest.setSuccess(true);
+            out.writeObject(addViewableRequest);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -172,7 +184,8 @@ public class ClientHandler extends Thread implements RequestVisitor {
         }
         viewableDAO.updateViewable(saga.getId(), saga.getTitle(), "Saga", ids);
         try {
-            out.writeObject("VIEWABLE_UPDATED");
+            updateViewableRequest.setSuccess(true);
+            out.writeObject(updateViewableRequest);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -183,7 +196,8 @@ public class ClientHandler extends Thread implements RequestVisitor {
         int movieId = getSessionsLinkedToMovieRequest.getMovieId();
         int amountSessions = movieDAO.getSessionLinkedToMovie(movieId);
         try {
-            out.writeObject(amountSessions);
+            getSessionsLinkedToMovieRequest.setAmountSessions(amountSessions);
+            out.writeObject(getSessionsLinkedToMovieRequest);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -195,7 +209,8 @@ public class ClientHandler extends Thread implements RequestVisitor {
         movie.setImagePath(FileManager.createPath(removeSpecialCharacters(movie.getTitle()) + ".jpg"));
         FileManager.createImageFromBytes(movie.getImage(), movie.getImagePath());
         movieDAO.create(movie);
-        out.writeObject("MOVIE_ADDED");
+        createMovieRequest.setStatus(true);
+        out.writeObject(createMovieRequest);
     }
 
     public static String removeSpecialCharacters(String str) {
@@ -209,10 +224,11 @@ public class ClientHandler extends Thread implements RequestVisitor {
             String hashedPassword = HashedPassword.getHashedPassword(client.getPassword());
             Client registeredClient = clientsDAO.create(new Client(client.getName(), client.getEmail(), client.getUsername(), hashedPassword));
             if (registeredClient != null) {
-                out.writeObject("Registration successful");
+                clientRegistrationRequest.setSuccess(true);
             } else {
-                out.writeObject("Registration failed");
+                clientRegistrationRequest.setSuccess(false);
             }
+            out.writeObject(clientRegistrationRequest);
         } catch (IOException e) {
             out.writeObject("Error during registration: " + e.getMessage());
         }
@@ -222,7 +238,8 @@ public class ClientHandler extends Thread implements RequestVisitor {
     public void visit(DeleteMoviesRequest deleteMoviesRequest) {
         try {
             movieDAO.delete(deleteMoviesRequest.getId());
-            out.writeObject("MOVIE_DELETED");
+            deleteMoviesRequest.setStatus(true);
+            out.writeObject(deleteMoviesRequest);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -231,7 +248,9 @@ public class ClientHandler extends Thread implements RequestVisitor {
     @Override
     public void visit(GetAllSessionRequest getAllSessionRequest) {
         try {
-            out.writeObject(sessionDAO.getAll());
+            List<MovieSession> sessions = sessionDAO.getAll();
+            getAllSessionRequest.setSessions(sessions);
+            out.writeObject(getAllSessionRequest);
         } catch (IOException | SQLException e) {
             throw new RuntimeException(e);
         }
@@ -244,13 +263,15 @@ public class ClientHandler extends Thread implements RequestVisitor {
         Client client = clientsDAO.getClientByUsername(username);
         if (client != null && HashedPassword.checkPassword(password, client.getPassword())) {
             try {
-                out.writeObject(client);
+                checkLoginRequest.setClient(client);
+                out.writeObject(checkLoginRequest);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         } else {
             try {
-                out.writeObject(null);
+                checkLoginRequest.setClient(null);
+                out.writeObject(checkLoginRequest);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -264,7 +285,8 @@ public class ClientHandler extends Thread implements RequestVisitor {
             for (Viewable movie : movies) {
                 movie.setImage(FileManager.getImageAsBytes(movie.getImagePath()));
             }
-            out.writeObject(movies);
+            getMoviesRequest.setMovies(movies);
+            out.writeObject(getMoviesRequest);
         } catch (IOException | SQLException e) {
             throw new RuntimeException(e);
         }
@@ -274,7 +296,9 @@ public class ClientHandler extends Thread implements RequestVisitor {
     public void visit(GetSessionByMovieId getSessionByMovieId) {
         int movieId = getSessionByMovieId.getMovieId();
         try {
-            out.writeObject(sessionDAO.getSessionsForMovie(viewableDAO.getViewableById(movieId)));
+            List<MovieSession> sessions = sessionDAO.getSessionsForMovie(viewableDAO.getViewableById(movieId));
+            getSessionByMovieId.setSessions(sessions);
+            out.writeObject(getSessionByMovieId);
         } catch (IOException | SQLException e) {
             throw new RuntimeException(e);
         }
@@ -284,7 +308,9 @@ public class ClientHandler extends Thread implements RequestVisitor {
     public void visit(GetTicketByClientRequest getTicketByClientRequest) {
         int clientId = getTicketByClientRequest.getClientId();
         try {
-            out.writeObject(ticketDAO.getTicketsByClient(clientId));
+            List<Ticket> tickets = ticketDAO.getTicketsByClient(clientId);
+            getTicketByClientRequest.setTickets(tickets);
+            out.writeObject(getTicketByClientRequest);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -294,7 +320,9 @@ public class ClientHandler extends Thread implements RequestVisitor {
     public void visit(GetSessionByIdRequest getSessionByIdRequest) {
         int sessionId = getSessionByIdRequest.getSessionId();
         try {
-            out.writeObject(sessionDAO.get(sessionId));
+            MovieSession session = sessionDAO.get(sessionId);
+            getSessionByIdRequest.setSession(session);
+            out.writeObject(getSessionByIdRequest);
         } catch (IOException | SQLException e) {
             throw new RuntimeException(e);
         }
@@ -306,7 +334,8 @@ public class ClientHandler extends Thread implements RequestVisitor {
         try {
             Movie movie = movieDAO.get(id);
             movie.setImage(FileManager.getImageAsBytes(movie.getImagePath()));
-            out.writeObject(movie);
+            getMovieByIdRequest.setMovie(movie);
+            out.writeObject(getMovieByIdRequest);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -316,13 +345,15 @@ public class ClientHandler extends Thread implements RequestVisitor {
     public void visit(CreateTicketRequest createTicketRequest) throws IOException {
         Ticket ticket = createTicketRequest.getTicket();
         ticketDAO.create(ticket);
-        out.writeObject("TICKET_CREATED");
+        createTicketRequest.setStatus(true);
+        out.writeObject(createTicketRequest);
     }
 
     @Override
     public void visit(DeleteSessionRequest deleteSessionRequest) throws IOException, SQLException {
         int sessionId = deleteSessionRequest.getSessionId();
         sessionDAO.delete(sessionId);
-        out.writeObject("SESSION_DELETED");
+        deleteSessionRequest.setSuccess(true);
+        out.writeObject(deleteSessionRequest);
     }
 }

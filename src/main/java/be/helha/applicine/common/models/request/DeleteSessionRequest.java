@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 public class DeleteSessionRequest extends ClientEvent {
     private int sessionId;
+    private boolean status;
 
     public DeleteSessionRequest(int sessionId) {
         this.sessionId = sessionId;
@@ -17,5 +18,13 @@ public class DeleteSessionRequest extends ClientEvent {
 
     public int getSessionId() {
         return sessionId;
+    }
+
+    public void setSuccess(boolean b) {
+        this.status = b;
+    }
+
+    public boolean getStatus() {
+        return status;
     }
 }

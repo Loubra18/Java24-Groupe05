@@ -3,19 +3,23 @@ package be.helha.applicine.client.controllers.managercontrollers;
 import be.helha.applicine.client.controllers.MasterApplication;
 import be.helha.applicine.client.controllers.ServerRequestHandler;
 import be.helha.applicine.client.views.AlertViewController;
+import be.helha.applicine.client.views.ClientViewController;
 import be.helha.applicine.common.models.Movie;
-import be.helha.applicine.common.models.request.GetMovieByIdRequest;
-import be.helha.applicine.common.models.request.GetMoviesRequest;
-import be.helha.applicine.common.models.request.GetRoomsRequest;
+import be.helha.applicine.common.models.MovieSession;
+import be.helha.applicine.common.models.Room;
+import be.helha.applicine.common.models.Viewable;
+import be.helha.applicine.common.models.request.*;
 import be.helha.applicine.server.database.DatabaseConnection;
 import be.helha.applicine.client.views.managerviews.MainManagerViewController;
 import be.helha.applicine.client.views.managerviews.SessionManagerViewController;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,35 +34,56 @@ public class ManagerController extends Application {
      * parentController is useful to say Master which window is currently open.
      */
     private MasterApplication parentController;
-    protected List<Movie> movieList;
+    protected List<Movie> movieList = new ArrayList<>();
 
     private MainManagerViewController mainManagerViewController;
 
-    public SessionManagerViewController sessionManagerViewController;
+    public MovieManagerApp movieManagerApp;
+    public SessionManagerApp sessionManagerApp;
+    public SpecialViewableController specialViewableController;
 
-    private ServerRequestHandler serverRequestHandler;
+    public SessionManagerViewController sessionManagerViewController;
+    protected List<Viewable> viewableList = new ArrayList<>();
+    protected List<Room> roomList = new ArrayList<>();
+    protected List<MovieSession> movieSessionList = new ArrayList<>();
+
+    public List<Movie> getMovieList() {
+        return movieList;
+    }
+
+    public List<Viewable> getViewableList() {
+        return viewableList;
+    }
+
+    public List<Room> getRoomList() {
+        return roomList;
+    }
+
+    public List<MovieSession> getMovieSessionList() {
+        return movieSessionList;
+    }
 
     /**
      * It fetches all the movies from the database to movieList.
      */
     public ManagerController(MasterApplication parentController) throws SQLException, IOException, ClassNotFoundException {
         this.parentController = parentController;
-        GetMoviesRequest request = new GetMoviesRequest();
-        serverRequestHandler = ServerRequestHandler.getInstance();
-        movieList = serverRequestHandler.sendRequest(request);
     }
 
     /**
      * It fetches all the movies from the database to movieList.
      */
     public ManagerController() throws IOException, ClassNotFoundException {
-        GetMoviesRequest request = new GetMoviesRequest();
-        serverRequestHandler = ServerRequestHandler.getInstance();
-        movieList = serverRequestHandler.sendRequest(request);
+
+    }
+
+    public SessionManagerApp getSessionManagerApp() {
+        return sessionManagerApp;
     }
 
     /**
      * Starts the Manager view.
+     *
      * @param adminPage the stage of the view.
      * @throws IOException  if there is an error with the fxml file.
      * @throws SQLException if there is an error with the database connection.
@@ -69,16 +94,19 @@ public class ManagerController extends Application {
         parentController.setCurrentWindow(MainManagerViewController.getStage());
         mainManagerViewController = mainFxmlLoader.getController();
         mainManagerViewController.setListener(this);
+        this.movieManagerApp = new MovieManagerApp(this.parentController);
 
-        MovieManagerApp movieManagerApp = new MovieManagerApp(parentController);
+        this.sessionManagerApp = new SessionManagerApp(this.parentController);
+
+        this.specialViewableController = new SpecialViewableController(this.parentController);
+
         movieManagerApp.setParentController(this);
-        SessionManagerApp sessionManagerApp = new SessionManagerApp(parentController);
         sessionManagerApp.setParentController(this);
-
-        SpecialViewableController specialViewableController = new SpecialViewableController(parentController);
         specialViewableController.setParentController(this);
         movieManagerApp.addListener(sessionManagerApp);
         movieManagerApp.addSpecialViewablesListener(specialViewableController);
+
+        System.out.println("sessionManagerApp after setting parent controller: " + sessionManagerApp);
 
         specialViewableController.addListener(sessionManagerApp);
         movieManagerApp.start(adminPage);
@@ -87,10 +115,13 @@ public class ManagerController extends Application {
         adminPage.setOnCloseRequest(e -> {
             DatabaseConnection.closeConnection();
         });
+        movieManagerApp.fullFieldMovieListFromDB();
     }
+
 
     /**
      * Launches the Manager view.
+     *
      * @param args the arguments of the main method.
      */
     public static void main(String[] args) {
@@ -106,15 +137,14 @@ public class ManagerController extends Application {
 
     /**
      * It returns the full movie list from the database.
+     *
      * @return List of Visionable objects which contains all the movies from the database.
      */
-    public List<Movie> fullFieldMovieListFromDB() throws ClassNotFoundException, IOException {
-        GetMoviesRequest request = new GetMoviesRequest();
-        return serverRequestHandler.sendRequest(request);
-    }
+
 
     /**
      * It returns the fxmlLoader of the movieManager.
+     *
      * @return the fxmlLoader of the movieManager.
      */
     protected FXMLLoader getMovieManagerFXML() {
@@ -123,6 +153,7 @@ public class ManagerController extends Application {
 
     /**
      * It returns the fxmlLoader of the sessionManager.
+     *
      * @return the fxmlLoader of the sessionManager.
      */
     protected FXMLLoader getSessionManagerFXML() {
@@ -131,6 +162,7 @@ public class ManagerController extends Application {
 
     /**
      * It returns the fxmlLoader of the specialViewable.
+     *
      * @return the fxmlLoader of the specialViewable.
      */
     protected FXMLLoader getSpecialViewableFXML() {
@@ -139,10 +171,11 @@ public class ManagerController extends Application {
 
     /**
      * It returns the movie from the database at index.
+     *
      * @param id the index of the movie in the movieList.
      * @return the movie from the database at index.
      */
     public Movie getMovieFrom(int id) {
-        return serverRequestHandler.sendRequest(new GetMovieByIdRequest(id));
+        return movieList.get(id);
     }
 }

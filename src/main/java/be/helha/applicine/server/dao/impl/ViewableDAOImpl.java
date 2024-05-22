@@ -101,12 +101,12 @@ public class ViewableDAOImpl implements ViewableDAO {
 
     @Override
     public int getViewableIdByMovieId(int id) {
-        try{
+        try {
             ResultSet rs = connection.createStatement().executeQuery("SELECT viewableid FROM viewablecontains WHERE movieid = " + id);
-            if(rs.next()){
+            if (rs.next()) {
                 return rs.getInt("viewableid");
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return id;
@@ -188,10 +188,13 @@ public class ViewableDAOImpl implements ViewableDAO {
         return array;
     }
 
+
+
     public int getTotalDurationFromMovies(ArrayList<Movie> movies) {
         int totalDuration = 0;
         for (Movie movie : movies) {
-            totalDuration += movie.getDuration();
+            if (movie != null && movie.getDuration() != 0)
+                totalDuration += movie.getDuration();
         }
         return totalDuration;
     }
@@ -246,7 +249,6 @@ public class ViewableDAOImpl implements ViewableDAO {
         }
         return 0;
     }
-
 
 
 }

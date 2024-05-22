@@ -7,7 +7,7 @@ import java.sql.SQLException;
 
 public class CreateTicketRequest extends ClientEvent {
     private Ticket ticket;
-
+    private boolean status;
     public CreateTicketRequest(Ticket ticket) {
         this.ticket = ticket;
     }
@@ -18,5 +18,9 @@ public class CreateTicketRequest extends ClientEvent {
     @Override
     public void dispatchOn(RequestVisitor requestVisitor) throws IOException, SQLException {
         requestVisitor.visit(this);
+    }
+
+    public void setStatus(boolean b) {
+        this.status = b;
     }
 }

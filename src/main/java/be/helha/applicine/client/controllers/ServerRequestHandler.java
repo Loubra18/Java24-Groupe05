@@ -1,20 +1,26 @@
 package be.helha.applicine.client.controllers;
 
-import be.helha.applicine.client.views.AlertViewController;
+import be.helha.applicine.common.models.request.*;
 import be.helha.applicine.common.network.ServerConstants;
-import kotlin.reflect.KParameter;
+import javafx.application.Platform;
 
 import java.io.*;
 import java.net.*;
+import java.sql.SQLException;
 
-public class ServerRequestHandler {
+public class ServerRequestHandler extends Thread implements RequestVisitor {
     private static ServerRequestHandler instance;
     private Socket clientSocket;
     private ObjectOutputStream out;
     private ObjectInputStream in;
 
+    private OnClientEventReceived listener;
+
+    private final Object lock = new Object();
+
     /**
      * (Singleton) Constructor for the ServerRequestHandler class.
+     *
      * @throws IOException if an I/O error occurs when creating the socket.
      */
     private ServerRequestHandler() throws IOException {
@@ -23,21 +29,8 @@ public class ServerRequestHandler {
         in = new ObjectInputStream(clientSocket.getInputStream());
     }
 
-    /**
-     * Sends a request to the server.
-     * @param request the request to send to the server.
-     * @param <T> the type of the response.
-     * @return the response from the server.
-     */
-    public <T> T sendRequest(Object request) {
-        try {
-            out.writeObject(request);
-            return (T) in.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            AlertViewController.showErrorMessage("Erreur lors de la connexion au serveur, veuillez réessayer plus tard.");
-            return null;
-
-        }
+    public void setOnViewablesReceivedListener(OnClientEventReceived listener) {
+        this.listener = listener;
     }
 
     /**
@@ -46,18 +39,167 @@ public class ServerRequestHandler {
      */
     public static ServerRequestHandler getInstance() throws IOException {
         if (instance == null) {
-            instance = new ServerRequestHandler();
+            synchronized (ServerRequestHandler.class) {
+                if (instance == null) {
+                    instance = new ServerRequestHandler();
+                    instance.start();
+                }
+            }
         }
         return instance;
     }
 
     /**
-     * Closes the input and output streams and the client socket.
-     * @throws IOException if an I/O error occurs when closing the streams or the socket.
+     * Sends a request to the server.
+     *
+     * @param clientEvent the request to send.
+     * @throws IOException if an I/O error occurs when sending the request.
      */
-    public void close() throws IOException {
-        in.close();
-        out.close();
-        clientSocket.close();
+    public void sendRequest(ClientEvent clientEvent) throws IOException {
+        synchronized (lock) {
+            out.writeObject(clientEvent);
+        }
+    }
+
+    @Override
+    public synchronized void run() {
+        try {
+            ClientEvent clientEvent;
+            while ((clientEvent = (ClientEvent) in.readObject()) != null) {
+                System.out.println("Received: " + clientEvent.getClass().getSimpleName());
+                clientEvent.dispatchOn(this);
+            }
+        } catch (IOException | ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void handleClientEvent(ClientEvent clientEvent) {
+        Platform.runLater(() -> {
+            try {
+                listener.onClientEvenReceived(clientEvent);
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    @Override
+    public void visit(CheckLoginRequest checkLoginRequest) {
+        handleClientEvent(checkLoginRequest);
+    }
+
+    @Override
+    public void visit(ClientRegistrationRequest clientRegistrationRequest) throws IOException {
+        handleClientEvent(clientRegistrationRequest);
+    }
+
+    @Override
+    public void visit(DeleteMoviesRequest deleteMoviesRequest) {
+        handleClientEvent(deleteMoviesRequest);
+    }
+
+    @Override
+    public void visit(GetAllSessionRequest getAllSessionRequest) {
+        handleClientEvent(getAllSessionRequest);
+    }
+
+    @Override
+    public void visit(GetMovieByIdRequest getMovieByIdRequest) {
+        handleClientEvent(getMovieByIdRequest);
+    }
+
+    @Override
+    public void visit(GetMoviesRequest getMoviesRequest) {
+        handleClientEvent(getMoviesRequest);
+    }
+
+    @Override
+    public void visit(GetSessionByIdRequest getSessionByIdRequest) {
+        handleClientEvent(getSessionByIdRequest);
+    }
+
+    @Override
+    public void visit(GetSessionByMovieId getSessionByMovieId) {
+        handleClientEvent(getSessionByMovieId);
+    }
+
+    @Override
+    public void visit(GetTicketByClientRequest getTicketByClientRequest) {
+        handleClientEvent(getTicketByClientRequest);
+    }
+
+    @Override
+    public void visit(CreateTicketRequest createTicketRequest) throws IOException {
+        handleClientEvent(createTicketRequest);
+    }
+
+    @Override
+    public void visit(DeleteSessionRequest deleteSessionRequest) throws IOException, SQLException {
+        handleClientEvent(deleteSessionRequest);
+    }
+
+    @Override
+    public void visit(CreateMovieRequest createMovieRequest) throws IOException {
+        handleClientEvent(createMovieRequest);
+    }
+
+    @Override
+    public void visit(GetSessionsLinkedToMovieRequest getSessionsLinkedToMovieRequest) {
+        handleClientEvent(getSessionsLinkedToMovieRequest);
+    }
+
+    @Override
+    public void visit(UpdateViewableRequest updateViewableRequest) throws IOException {
+        handleClientEvent(updateViewableRequest);
+    }
+
+    @Override
+    public void visit(AddViewableRequest addViewableRequest) {
+        handleClientEvent(addViewableRequest);
+    }
+
+    @Override
+    public void visit(GetViewablesRequest getViewablesRequest) throws IOException {
+        handleClientEvent(getViewablesRequest);
+    }
+
+    @Override
+    public void visit(DeleteViewableRequest deleteViewableRequest) {
+        handleClientEvent(deleteViewableRequest);
+    }
+
+    @Override
+    public void visit(GetRoomsRequest getRoomsRequest) {
+        handleClientEvent(getRoomsRequest);
+    }
+
+    @Override
+    public void visit(UpdateSessionRequest updateSessionRequest) {
+        handleClientEvent(updateSessionRequest);
+    }
+
+    @Override
+    public void visit(AddSessionRequest addSessionRequest) {
+        handleClientEvent(addSessionRequest);
+    }
+
+    @Override
+    public void visit(GetRoomByIdRequest getRoomByIdRequest) {
+        handleClientEvent(getRoomByIdRequest);
+    }
+
+    @Override
+    public void visit(UpdateMovieRequest updateMovieRequest) {
+        handleClientEvent(updateMovieRequest);
+    }
+
+    @Override
+    public void visit(GetSagasLinkedToMovieRequest getSagasLinkedToMovieRequest) {
+        handleClientEvent(getSagasLinkedToMovieRequest);
+    }
+
+    public interface OnClientEventReceived {
+        void onClientEvenReceived(ClientEvent clientEvent) throws IOException, ClassNotFoundException;
     }
 }

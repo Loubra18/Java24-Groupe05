@@ -8,6 +8,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 
 
+import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -205,7 +206,11 @@ public class SpecialViewableViewController {
     }
 
     public void onDeleteSagaButtonClick(ActionEvent event) throws SQLException {
-        listener.onSagaDeleteButtonClick();
+        try {
+            listener.onSagaDeleteButtonClick();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
@@ -229,7 +234,7 @@ public class SpecialViewableViewController {
 
         void onAddSagaButtonClick();
 
-        void onSagaDeleteButtonClick() throws SQLException;
+        void onSagaDeleteButtonClick() throws SQLException, IOException;
     }
 
     public void refresh() throws SQLException {

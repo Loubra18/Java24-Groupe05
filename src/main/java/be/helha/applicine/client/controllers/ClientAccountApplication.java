@@ -5,10 +5,12 @@ import be.helha.applicine.common.models.Client;
 import be.helha.applicine.common.models.Session;
 import be.helha.applicine.common.models.Ticket;
 import be.helha.applicine.client.views.ClientAccountControllerView;
+import be.helha.applicine.common.models.request.ClientEvent;
 import be.helha.applicine.common.models.request.GetTicketByClientRequest;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -23,9 +25,10 @@ import java.util.List;
  * It uses the ServerRequestHandler to communicate with the server.
  * It uses the MasterApplication to change the window and the controller of the view.
  * It implements the ClientAccountControllerView.ClientAccountListener to listen to the client account view.
+ *
  * @implSpec The ClientAccountApplication class is a subclass of Application.
  */
-public class ClientAccountApplication extends Application implements ClientAccountControllerView.ClientAccountListener {
+public class ClientAccountApplication extends Application implements ClientAccountControllerView.ClientAccountListener, ServerRequestHandler.OnClientEventReceived {
     //renvoie le fichier FXML de la vue ClientAccount
     private final FXMLLoader fxmlLoader = new FXMLLoader(ClientAccountControllerView.getFXMLResource());
 
@@ -36,19 +39,20 @@ public class ClientAccountApplication extends Application implements ClientAccou
 
     /**
      * Constructor of the ClientAccountApplication
+     *
      * @param masterApplication the parent controller (MasterApplication).
      * @throws IOException if the server request handler can't be created.
      */
     public ClientAccountApplication(MasterApplication masterApplication) throws IOException {
-            this.parentController = masterApplication;
-            this.serverRequestHandler = ServerRequestHandler.getInstance();
+        this.parentController = masterApplication;
+        this.serverRequestHandler = ServerRequestHandler.getInstance();
     }
 
     /**
      * Permit to close the client account window and return to the client window.
      */
     @Override
-    public void toClientSide(){
+    public void toClientSide() {
         parentController.toClient();
     }
 
@@ -56,12 +60,13 @@ public class ClientAccountApplication extends Application implements ClientAccou
      * Permit to close the client account window and return to the login window.
      */
     @Override
-    public void toClientAccount(){
+    public void toClientAccount() {
         parentController.toClientAccount();
     }
 
     /**
      * Permit to get the client account from the actual session.
+     *
      * @return the client account logged in.
      */
     @Override
@@ -72,6 +77,7 @@ public class ClientAccountApplication extends Application implements ClientAccou
 
     /**
      * Starts the client account window by setting the stage of the fxmlLoader and initializing the client account page.
+     *
      * @param stage the stage of the client account window.
      */
     @Override
@@ -84,9 +90,7 @@ public class ClientAccountApplication extends Application implements ClientAccou
             parentController.setCurrentWindow(clientAccountControllerView.getAccountWindow());
 
             clientAccountControllerView.initializeClientAccountPage(getClientAccount());
-            List<Ticket> tickets = getTicketsByClient(getClientAccount().getId());
-            addTickets(tickets, clientAccountControllerView);
-        } catch (IOException e){
+        } catch (IOException e) {
             AlertViewController.showErrorMessage("Problème de chargement de la page, veuillez réessayer plus tard. Contactez un administrateur si le problème se maintient.");
             parentController.toClient();
         }
@@ -94,15 +98,21 @@ public class ClientAccountApplication extends Application implements ClientAccou
 
     /**
      * Gets the tickets of a client by his id.
+     *
      * @param id the id of the client.
      * @return the list of tickets of the client.
      */
-    private List<Ticket> getTicketsByClient(int id) {
-        return serverRequestHandler.sendRequest(new GetTicketByClientRequest(id));
+    private void getTicketsByClient(int id) {
+        try {
+            serverRequestHandler.sendRequest(new GetTicketByClientRequest(id));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
      * Adds tickets to the client account page.
+     *
      * @param tickets the list of tickets to add.
      */
     public void addTickets(List<Ticket> tickets, ClientAccountControllerView clientAccountControllerView) {
@@ -110,9 +120,19 @@ public class ClientAccountApplication extends Application implements ClientAccou
         for (Ticket ticket : tickets) {
             try {
                 clientAccountControllerView.addTicket(ticket);
-            }catch (IOException e){
+            } catch (IOException e) {
                 ticketsWithNullSession.add(ticket);
             }
+        }
+    }
+
+    @Override
+    public void onClientEvenReceived(ClientEvent clientEvent) {
+        if (clientEvent instanceof GetTicketByClientRequest) {
+            GetTicketByClientRequest getTicketByClientRequest = (GetTicketByClientRequest) clientEvent;
+            List<Ticket> tickets = getTicketByClientRequest.getTickets();
+            ClientAccountControllerView clientAccountControllerView = fxmlLoader.getController();
+            addTickets(tickets, clientAccountControllerView);
         }
     }
 }

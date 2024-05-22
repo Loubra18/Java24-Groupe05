@@ -24,17 +24,22 @@ public class MovieSession implements Serializable {
      */
     private Room room;
     /**
+     * The room id of the session.
+     */
+    private int roomid;
+    /**
      * The version of the session.
      */
     private final String version;
 
     /**
      * Constructor of the class.
-     * @param id The id of the session.
+     *
+     * @param id       The id of the session.
      * @param viewable The viewable of the session.
-     * @param time The date and the time of the session.
-     * @param room The room of the session.
-     * @param version The version of the session.
+     * @param time     The date and the time of the session.
+     * @param room     The room of the session.
+     * @param version  The version of the session.
      */
     public MovieSession(int id, Viewable viewable, String time, Room room, String version) {
         this.id = id;
@@ -44,8 +49,17 @@ public class MovieSession implements Serializable {
         this.version = version;
     }
 
+    public MovieSession(Integer sessionId, Viewable viewable, String convertedDateTime, int roomById, String version) {
+        this.id = sessionId;
+        this.viewable = viewable;
+        this.time = convertedDateTime;
+        this.roomid = roomById;
+        this.version = version;
+    }
+
     /**
      * Get the viewable of the session.
+     *
      * @return The viewable of the session.
      */
     public Viewable getViewable() {
@@ -54,6 +68,7 @@ public class MovieSession implements Serializable {
 
     /**
      * Get the id of the session.
+     *
      * @return The id of the session.
      */
     public int getId() {
@@ -62,6 +77,7 @@ public class MovieSession implements Serializable {
 
     /**
      * Get the date and the time of the session.
+     *
      * @return The date and the time of the session.
      */
     public String getTime() {
@@ -70,6 +86,7 @@ public class MovieSession implements Serializable {
 
     /**
      * Get the room of the session.
+     *
      * @return The room of the session.
      */
     public Room getRoom() {
@@ -78,6 +95,7 @@ public class MovieSession implements Serializable {
 
     /**
      * Set the viewable of the session.
+     *
      * @param viewable The viewable of the session.
      */
     public void setViewable(Movie viewable) {
@@ -86,6 +104,7 @@ public class MovieSession implements Serializable {
 
     /**
      * Set the date and the time of the session.
+     *
      * @param time The date and the time of the session.
      */
     public void setTime(String time) {
@@ -94,6 +113,7 @@ public class MovieSession implements Serializable {
 
     /**
      * Set the room of the session.
+     *
      * @param room The room of the session.
      */
     public void setRoom(Room room) {
@@ -102,6 +122,7 @@ public class MovieSession implements Serializable {
 
     /**
      * Get the version of the session.
+     *
      * @return The version of the session.
      */
     public String getVersion() {
@@ -110,6 +131,7 @@ public class MovieSession implements Serializable {
 
     /**
      * Get the date of the session.
+     *
      * @return The date of the session.
      */
     public LocalDate getDate() {
@@ -120,6 +142,7 @@ public class MovieSession implements Serializable {
 
     /**
      * Get the hour of the session.
+     *
      * @return The hour of the session.
      */
     public String getHourFromTime() {
@@ -128,6 +151,7 @@ public class MovieSession implements Serializable {
 
     /**
      * Get the minute of the session.
+     *
      * @return The minute of the session.
      */
     public String getMinuteFromTime() {

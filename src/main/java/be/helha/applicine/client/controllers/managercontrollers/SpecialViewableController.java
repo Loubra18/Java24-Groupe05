@@ -48,7 +48,7 @@ public class SpecialViewableController extends ManagerController implements Spec
         specialViewableFxmlLoader.load();
         specialViewableViewController = specialViewableFxmlLoader.getController();
         specialViewableViewController.setListener(this);
-        specialViewableViewController.init();
+
     }
 
     /**
@@ -69,7 +69,7 @@ public class SpecialViewableController extends ManagerController implements Spec
         specialViewableFxmlLoader = parentController.getSpecialViewableFXML();
         specialViewableViewController = specialViewableFxmlLoader.getController();
         specialViewableViewController.setListener(this);
-        specialViewableViewController.init();
+        movieList = new ArrayList<>();
     }
 
     /**
@@ -119,7 +119,6 @@ public class SpecialViewableController extends ManagerController implements Spec
     @Override
     public ArrayList<String> displayAllMovies() {
         movieTitleList = new ArrayList<>();
-        movieList = serverRequestHandler.sendRequest(new GetMoviesRequest());
         for (Movie movie : movieList) {
             movieTitleList.add(movie.getTitle());
         }
@@ -165,7 +164,11 @@ public class SpecialViewableController extends ManagerController implements Spec
      */
     private void modifySagaInDB(int id, String name, String type, ArrayList<Integer> addedMoviesIds) {
         ArrayList<Movie> movies = getMoviesByIDs(addedMoviesIds);
-        serverRequestHandler.sendRequest(new UpdateViewableRequest(new Saga(id, name, null, null, getTotalDuration(), null, null, null, movies)));
+        try {
+            serverRequestHandler.sendRequest(new UpdateViewableRequest(new Saga(id, name, null, null, getTotalDuration(), null, null, null, movies)));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -188,7 +191,11 @@ public class SpecialViewableController extends ManagerController implements Spec
      */
     private void addSagaIntoDB(String name, String type, ArrayList<Integer> addedMoviesIds) {
         ArrayList<Movie> movies = getMoviesByIDs(addedMoviesIds);
-        serverRequestHandler.sendRequest(new AddViewableRequest(new Saga(0, name, null, null, getTotalDuration(), null, null, null, movies)));
+        try {
+            serverRequestHandler.sendRequest(new AddViewableRequest(new Saga(0, name, null, null, getTotalDuration(), null, null, null, movies)));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -200,8 +207,12 @@ public class SpecialViewableController extends ManagerController implements Spec
     private ArrayList<Movie> getMoviesByIDs(ArrayList<Integer> addedMoviesIds) {
         ArrayList<Movie> movies = new ArrayList<>();
         for (int id : addedMoviesIds) {
-            Movie movie = serverRequestHandler.sendRequest(new GetMovieByIdRequest(id));
-            movies.add(movie);
+            for (Movie movie : movieList) {
+                if (movie.getId() == id) {
+                    movies.add(movie);
+                    break;
+                }
+            }
         }
         return movies;
     }
@@ -233,8 +244,12 @@ public class SpecialViewableController extends ManagerController implements Spec
      */
     @Override
     public void displaySagas() {
-        ArrayList<Viewable> viewables = serverRequestHandler.sendRequest(new GetViewablesRequest());
-        for (Viewable viewable : viewables) {
+        try {
+            serverRequestHandler.sendRequest(new GetViewablesRequest());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        for (Viewable viewable : viewableList) {
             //si le type dynamique d'un objet viewable est une saga, on l'affiche dans le list view
             if (viewable instanceof Saga) {
                 System.out.println(viewable.getTitle());
@@ -272,17 +287,16 @@ public class SpecialViewableController extends ManagerController implements Spec
      * Supprime la saga en cours.
      */
     @Override
-    public void onSagaDeleteButtonClick() throws SQLException {
+    public void onSagaDeleteButtonClick() throws SQLException, IOException {
         boolean confirm = AlertViewController.showConfirmationMessage("Voulez vous vraiment supprimer cette saga ?");
         if (confirm) {
-            String request;
-            request = serverRequestHandler.sendRequest(new DeleteViewableRequest(selectedSaga.getId()));
-            if (request.equals("VIEWABLE_NOT_DELETED")) {
-                AlertViewController.showErrorMessage("Impossible de supprimer cette saga car des séances y sont liées");
-            } else {
-                specialViewableViewController.refresh();
-                notifyListeners(); //Permettra aux sessions de disposer des nouvelles sagas/ supprimer les anciennes
-            }
+            serverRequestHandler.sendRequest(new DeleteViewableRequest(selectedSaga.getId()));
+//            if (request.equals("VIEWABLE_NOT_DELETED")) {
+//                AlertViewController.showErrorMessage("Impossible de supprimer cette saga car des séances y sont liées");
+//            } else {
+//                specialViewableViewController.refresh();
+//                notifyListeners(); //Permettra aux sessions de disposer des nouvelles sagas/ supprimer les anciennes
+//            }
         }
     }
 
