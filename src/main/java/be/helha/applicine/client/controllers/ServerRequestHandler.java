@@ -16,7 +16,6 @@ public class ServerRequestHandler extends Thread implements RequestVisitor {
 
     private OnClientEventReceived listener;
 
-    private final Object lock = new Object();
 
     /**
      * (Singleton) Constructor for the ServerRequestHandler class.
@@ -27,6 +26,7 @@ public class ServerRequestHandler extends Thread implements RequestVisitor {
         clientSocket = new Socket(ServerConstants.HOST, ServerConstants.PORT);
         out = new ObjectOutputStream(clientSocket.getOutputStream());
         in = new ObjectInputStream(clientSocket.getInputStream());
+        this.setDaemon(true);
     }
 
     public void setOnViewablesReceivedListener(OnClientEventReceived listener) {
@@ -56,9 +56,7 @@ public class ServerRequestHandler extends Thread implements RequestVisitor {
      * @throws IOException if an I/O error occurs when sending the request.
      */
     public void sendRequest(ClientEvent clientEvent) throws IOException {
-        synchronized (lock) {
             out.writeObject(clientEvent);
-        }
     }
 
     @Override

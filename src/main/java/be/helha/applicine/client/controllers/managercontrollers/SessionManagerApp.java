@@ -15,7 +15,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 //ecoute les changements de la liste de films et de la liste de séances de l'app MovieManagerApp
@@ -105,7 +104,7 @@ public class SessionManagerApp extends ManagerController implements SessionManag
                 serverRequestHandler.sendRequest(new UpdateSessionRequest(new MovieSession(sessionId, viewableList.get(movieId), convertedDateTime, getRoomById(roomId), version)));
             }
             serverRequestHandler.sendRequest(new GetAllSessionRequest());
-            refreshSessionManager(movieSessionList);
+            refreshSessionManager();
         } catch (InvalideFieldsExceptions e) {
             AlertViewController.showErrorMessage("Champs invalides : " + e.getMessage());
         } catch (TimeConflictException e) {
@@ -144,6 +143,8 @@ public class SessionManagerApp extends ManagerController implements SessionManag
     @Override
     public void setPossibleMovies() {
         sessionManagerViewController.clearPossibleNames();
+        viewableList = parentController.getViewableList();
+        System.out.println("viewableList: " + viewableList.size());
         for (Viewable v : viewableList) {
             sessionManagerViewController.addPossibleName(v.getTitle());
         }
@@ -156,6 +157,7 @@ public class SessionManagerApp extends ManagerController implements SessionManag
      */
     @Override
     public Integer getMovieDuration(int id) {
+        viewableList = parentController.getViewableList();
         Viewable v = viewableList.get(id);
         int duration = v.getTotalDuration();
         return duration;
@@ -166,6 +168,8 @@ public class SessionManagerApp extends ManagerController implements SessionManag
      */
     @Override
     public void setPossibleRooms() {
+        roomList = parentController.getRoomList();
+        System.out.println("roomList: " + roomList.size());
         for (Room r : roomList) {
             sessionManagerViewController.addPossibleRoom(r.getNumber());
         }
@@ -177,6 +181,7 @@ public class SessionManagerApp extends ManagerController implements SessionManag
      * @return the viewable from the current selection
      */
     public Viewable getViewableFrom(Integer currentSelection) {
+        viewableList = parentController.getViewableList();
         return viewableList.get(currentSelection);
     }
 
@@ -208,7 +213,7 @@ public class SessionManagerApp extends ManagerController implements SessionManag
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            refreshSessionManager(movieSessionList);
+            refreshSessionManager();
         }
     }
 
@@ -219,6 +224,7 @@ public class SessionManagerApp extends ManagerController implements SessionManag
      */
     @Override
     public MovieSession getMovieSessionById(int id) {
+        movieSessionList = parentController.getMovieSessionList();
         return movieSessionList.get(id);
     }
 
@@ -228,14 +234,18 @@ public class SessionManagerApp extends ManagerController implements SessionManag
      * @return the room by the id.
      */
     public Room getRoomFrom(int index){
+        roomList = parentController.getRoomList();
+        System.out.println("roomList: " + roomList.size());
+        System.out.println("index: " + index);
         return roomList.get(index);
     }
 
     /**
      * Refreshes the session manager view.
      */
-    public void refreshSessionManager(List<MovieSession> movieSessionList) {
+    public void refreshSessionManager() {
         try {
+            List<MovieSession> movieSessionList = parentController.getMovieSessionList();
             sessionManagerViewController.clearSessions();
             System.out.println("movieSessionList: " + movieSessionList.size());
             for (MovieSession movieSession : movieSessionList) {
@@ -265,7 +275,7 @@ public class SessionManagerApp extends ManagerController implements SessionManag
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        refreshSessionManager(movieSessionList);
+        refreshSessionManager();
         setPossibleMovies();
         System.out.println("SessionManagerApp invalidated");
     }
@@ -276,6 +286,7 @@ public class SessionManagerApp extends ManagerController implements SessionManag
      * @return the room from the id
      */
     public Room getRoomById(int id){
+        roomList = parentController.getRoomList();
         return roomList.get(id);
     }
 }

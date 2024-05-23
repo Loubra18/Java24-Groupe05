@@ -94,14 +94,13 @@ public class SpecialViewableViewController {
     //methode d'initialisation de la vue (remplissage des listes, des combobox, etc)
     public void init() throws SQLException {
         VboxToDisplay.prefWidthProperty().bind(sagaList.widthProperty());
-        fillMovieChoice();
         displaySagas();
     }
 
 
-    public void fillMovieChoice() throws SQLException {
+    public void fillMovieChoice(List<String> moviesTitleToChoose) {
+        System.out.println("fillMovieChoice");
         movieChoice.getItems().clear();
-        moviesTitleToChoose = listener.displayAllMovies();
         for (String title : moviesTitleToChoose) {
             movieChoice.getItems().add(title);
         }
@@ -238,7 +237,6 @@ public class SpecialViewableViewController {
     }
 
     public void refresh() throws SQLException {
-        fillMovieChoice();
         displaySagas();
     }
 

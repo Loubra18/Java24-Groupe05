@@ -47,6 +47,22 @@ public class ManagerController extends Application {
     protected List<Room> roomList = new ArrayList<>();
     protected List<MovieSession> movieSessionList = new ArrayList<>();
 
+    public void setMovieList(List<Movie> movieList) {
+        this.movieList = movieList;
+    }
+
+    public void setViewableList(List<Viewable> viewableList) {
+        this.viewableList = viewableList;
+    }
+
+    public void setRoomList(List<Room> roomList) {
+        this.roomList = roomList;
+    }
+
+    public void setMovieSessionList(List<MovieSession> movieSessionList) {
+        this.movieSessionList = movieSessionList;
+    }
+
     public List<Movie> getMovieList() {
         return movieList;
     }
@@ -81,6 +97,14 @@ public class ManagerController extends Application {
         return sessionManagerApp;
     }
 
+    public MovieManagerApp getMovieManagerApp() {
+        return movieManagerApp;
+    }
+
+    public SpecialViewableController getSpecialViewableController() {
+        return specialViewableController;
+    }
+
     /**
      * Starts the Manager view.
      *
@@ -94,15 +118,13 @@ public class ManagerController extends Application {
         parentController.setCurrentWindow(MainManagerViewController.getStage());
         mainManagerViewController = mainFxmlLoader.getController();
         mainManagerViewController.setListener(this);
-        this.movieManagerApp = new MovieManagerApp(this.parentController);
-
         this.sessionManagerApp = new SessionManagerApp(this.parentController);
-
         this.specialViewableController = new SpecialViewableController(this.parentController);
-
+        this.movieManagerApp = new MovieManagerApp(this.parentController);
+        specialViewableController.setParentController(this);
         movieManagerApp.setParentController(this);
         sessionManagerApp.setParentController(this);
-        specialViewableController.setParentController(this);
+
         movieManagerApp.addListener(sessionManagerApp);
         movieManagerApp.addSpecialViewablesListener(specialViewableController);
 

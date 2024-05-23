@@ -118,6 +118,8 @@ public class ClientController extends Application implements ClientViewControlle
                 GetViewablesRequest getViewablesRequest = (GetViewablesRequest) clientEvent;
                 List<Viewable> viewables = getViewablesRequest.getViewables();
                 addMovies(clientViewController, viewables);
+            } else {
+                System.out.println("Client event received: " + clientEvent);
             }
         });
     }

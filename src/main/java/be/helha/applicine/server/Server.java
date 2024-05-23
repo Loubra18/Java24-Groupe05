@@ -1,6 +1,7 @@
 package be.helha.applicine.server;
 
 import be.helha.applicine.common.models.Client;
+import be.helha.applicine.common.models.request.ClientEvent;
 import be.helha.applicine.common.network.ServerConstants;
 import be.helha.applicine.server.dao.ClientsDAO;
 import be.helha.applicine.server.dao.MovieDAO;
@@ -13,8 +14,11 @@ import be.helha.applicine.server.database.ApiRequest;
 import java.io.*;
 import java.net.*;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Server {
+    private static List<ClientHandler> clients = new ArrayList<>();
 
     public static void main(String[] args) throws IOException {
         initializeAppdata();
@@ -25,7 +29,9 @@ public class Server {
             Socket clientSocket = serverSocket.accept();
             System.out.println("New client connected");
             try {
-                new ClientHandler(clientSocket).start();
+                ClientHandler clientHandler = new ClientHandler(clientSocket);
+                clientHandler.start();
+                clients.add(clientHandler);
             } catch (IOException e) {
                 System.out.println("Error creating client handler: " + e.getMessage());
             } catch (SQLException e) {
@@ -57,6 +63,12 @@ public class Server {
         RoomDAO roomDAO = new RoomDAOImpl();
         if (roomDAO.isRoomTableEmpty()) {
             roomDAO.fillRoomTable();
+        }
+    }
+
+    public static void broadcast(ClientEvent event) {
+        for (ClientHandler clientHandler : clients) {
+            clientHandler.sendEvent(event);
         }
     }
 }

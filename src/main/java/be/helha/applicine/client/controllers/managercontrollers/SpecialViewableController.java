@@ -48,15 +48,15 @@ public class SpecialViewableController extends ManagerController implements Spec
         specialViewableFxmlLoader.load();
         specialViewableViewController = specialViewableFxmlLoader.getController();
         specialViewableViewController.setListener(this);
-
     }
 
     /**
      * Setter pour le controller parent.
      * @param parentController le controller parent (ManagerController).
      */
-    public void setParentController(ManagerController parentController) {
+    public void setParentController(ManagerController parentController) throws SQLException {
         this.parentController = parentController;
+
     }
 
     /**
@@ -66,10 +66,16 @@ public class SpecialViewableController extends ManagerController implements Spec
      */
     @Override
     public void start(Stage adminPage) throws SQLException {
+        try {
+            serverRequestHandler.sendRequest(new GetViewablesRequest());
+            serverRequestHandler.sendRequest(new GetMoviesRequest());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         specialViewableFxmlLoader = parentController.getSpecialViewableFXML();
         specialViewableViewController = specialViewableFxmlLoader.getController();
         specialViewableViewController.setListener(this);
-        movieList = new ArrayList<>();
+        specialViewableViewController.init();
     }
 
     /**
@@ -118,10 +124,11 @@ public class SpecialViewableController extends ManagerController implements Spec
      */
     @Override
     public ArrayList<String> displayAllMovies() {
-        movieTitleList = new ArrayList<>();
-        for (Movie movie : movieList) {
+        System.out.println("taille: "+ parentController.getMovieList().size());
+        for (Movie movie : parentController.getMovieList()) {
             movieTitleList.add(movie.getTitle());
         }
+        specialViewableViewController.fillMovieChoice(movieTitleList);
         return (ArrayList<String>) movieTitleList;
     }
 
@@ -131,7 +138,7 @@ public class SpecialViewableController extends ManagerController implements Spec
      */
     @Override
     public void onMovieChoising(int selectedIndex) {
-        selectedMovies = movieList.get(selectedIndex);
+        selectedMovies = parentController.getMovieList().get(selectedIndex);
     }
 
     /**
@@ -207,7 +214,7 @@ public class SpecialViewableController extends ManagerController implements Spec
     private ArrayList<Movie> getMoviesByIDs(ArrayList<Integer> addedMoviesIds) {
         ArrayList<Movie> movies = new ArrayList<>();
         for (int id : addedMoviesIds) {
-            for (Movie movie : movieList) {
+            for (Movie movie : parentController.getMovieList()) {
                 if (movie.getId() == id) {
                     movies.add(movie);
                     break;
@@ -244,12 +251,8 @@ public class SpecialViewableController extends ManagerController implements Spec
      */
     @Override
     public void displaySagas() {
-        try {
-            serverRequestHandler.sendRequest(new GetViewablesRequest());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        for (Viewable viewable : viewableList) {
+        System.out.println(parentController.getViewableList().size());
+        for (Viewable viewable : parentController.getViewableList()) {
             //si le type dynamique d'un objet viewable est une saga, on l'affiche dans le list view
             if (viewable instanceof Saga) {
                 System.out.println(viewable.getTitle());
@@ -339,21 +342,17 @@ public class SpecialViewableController extends ManagerController implements Spec
         }
     }
 
+    public SpecialViewableViewController getSpecialViewableViewController() {
+        return specialViewableViewController;
+    }
+
+
     /**
      * Notifie les écouteurs.
      * @param observable l'observable.
      */
     @Override
     public void invalidated(Observable observable) {
-        try {
-            specialViewableViewController.fillMovieChoice();
-        } catch (SQLException error) {
-            AlertViewController.showErrorMessage("Erreur lors de la récupération des films. Essaie de la connection au serveur.");
-            try {
-                serverRequestHandler = ServerRequestHandler.getInstance();
-            } catch (IOException testConnection) {
-                AlertViewController.showErrorMessage("Erreur lors de la connection au serveur. Veuillez redémarrer le serveur ou contactez un administrateur réseaux.");
-            }
-        }
+        specialViewableViewController.fillMovieChoice(displayAllMovies());
     }
 }

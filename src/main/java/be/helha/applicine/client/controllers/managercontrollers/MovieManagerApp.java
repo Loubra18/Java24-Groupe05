@@ -3,7 +3,7 @@ package be.helha.applicine.client.controllers.managercontrollers;
 import be.helha.applicine.client.controllers.MasterApplication;
 import be.helha.applicine.client.controllers.ServerRequestHandler;
 import be.helha.applicine.client.views.AlertViewController;
-import be.helha.applicine.common.models.Session;
+import be.helha.applicine.client.views.managerviews.SpecialViewableViewController;
 import be.helha.applicine.common.models.request.*;
 import be.helha.applicine.server.FileManager;
 import be.helha.applicine.common.models.Movie;
@@ -20,7 +20,6 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
 
 //notifiera les classes qui écoutent que la liste de films a changé
 
@@ -249,6 +248,7 @@ public class MovieManagerApp extends ManagerController implements MovieManagerVi
      */
     public void refreshMovieManager() {
         movieManagerViewController.clearMovies();
+        movieList = parentController.getMovieList();
         for (Movie movie : movieList) {
             movieManagerViewController.displayMovie(movie);
         }
@@ -325,66 +325,75 @@ public class MovieManagerApp extends ManagerController implements MovieManagerVi
     public void onClientEvenReceived(ClientEvent clientEvent) {
         Platform.runLater(() -> {
             if (clientEvent instanceof GetMoviesRequest request) {
-                movieList = request.getMovies();
-                System.out.println("Movie list: " + movieList.size());
+                parentController.setMovieList(request.getMovies());
                 refreshMovieManager();
+                parentController.getSpecialViewableController().displayAllMovies();
             } else if (clientEvent instanceof CreateMovieRequest) {
                 CreateMovieRequest request = (CreateMovieRequest) clientEvent;
                 if (request.getStatus()) {
-                    fullFieldMovieListFromDB();
+                    refreshAll();
                 }
             } else if (clientEvent instanceof DeleteMoviesRequest) {
                 DeleteMoviesRequest request = (DeleteMoviesRequest) clientEvent;
                 if (request.getStatus()) {
-                    fullFieldMovieListFromDB();
+                    refreshAll();
                 }
             } else if (clientEvent instanceof UpdateMovieRequest) {
                 UpdateMovieRequest request = (UpdateMovieRequest) clientEvent;
                 if (request.getStatus()) {
-                    fullFieldMovieListFromDB();
+                    refreshAll();
                 }
             } else if (clientEvent instanceof GetViewablesRequest) {
                 GetViewablesRequest request = (GetViewablesRequest) clientEvent;
-                viewableList = request.getViewables();
+                parentController.setViewableList(request.getViewables());
+                parentController.getSpecialViewableController().displaySagas();
+                parentController.getSpecialViewableController().displayAllMovies();
             } else if (clientEvent instanceof AddViewableRequest) {
                 AddViewableRequest request = (AddViewableRequest) clientEvent;
                 if (request.getSuccess()) {
-                    fullFieldMovieListFromDB();
+                    refreshAll();
                 }
             } else if (clientEvent instanceof DeleteViewableRequest) {
                 DeleteViewableRequest request = (DeleteViewableRequest) clientEvent;
                 if (request.getSuccess()) {
-                    fullFieldMovieListFromDB();
+                    refreshAll();
                 }
             } else if (clientEvent instanceof UpdateViewableRequest) {
                 UpdateViewableRequest request = (UpdateViewableRequest) clientEvent;
                 if (request.getSuccess()) {
-                    fullFieldMovieListFromDB();
+                    refreshAll();
                 }
             } else if (clientEvent instanceof GetAllSessionRequest) {
                 GetAllSessionRequest request = (GetAllSessionRequest) clientEvent;
-                movieSessionList = request.getSessions();
-                System.out.println("Movie session list: " + movieSessionList.size());
-                sessionManagerApp.refreshSessionManager(movieSessionList);
+                parentController.setMovieSessionList(request.getSessions());
+                refreshAll();
             } else if (clientEvent instanceof AddSessionRequest) {
                 AddSessionRequest request = (AddSessionRequest) clientEvent;
                 if (request.getSuccess()) {
-                    fullFieldMovieListFromDB();
+                    refreshAll();
                 }
             } else if (clientEvent instanceof DeleteSessionRequest) {
                 DeleteSessionRequest request = (DeleteSessionRequest) clientEvent;
                 if (request.getStatus()) {
-                    fullFieldMovieListFromDB();
+                    refreshAll();
                 }
             } else if (clientEvent instanceof UpdateSessionRequest) {
                 UpdateSessionRequest request = (UpdateSessionRequest) clientEvent;
                 if (request.getSuccess()) {
-                    fullFieldMovieListFromDB();
+                    refreshAll();
                 }
             } else if (clientEvent instanceof GetRoomsRequest) {
                 GetRoomsRequest request = (GetRoomsRequest) clientEvent;
-                roomList = request.getRooms();
+                parentController.setRoomList(request.getRooms());
+                System.out.println("Room list: " + parentController.getRoomList().size());
+                refreshAll();
             }
         });
+    }
+
+    public void refreshAll() {
+        parentController.getSessionManagerApp().refreshSessionManager();
+        parentController.getSessionManagerApp().setPossibleRooms();
+        parentController.getSessionManagerApp().setPossibleMovies();
     }
 }

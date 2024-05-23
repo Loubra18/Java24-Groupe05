@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClientHandler extends Thread implements RequestVisitor {
+
     private Socket clientSocket;
     private MovieDAO movieDAO;
     private ClientsDAO clientsDAO;
@@ -51,6 +52,14 @@ public class ClientHandler extends Thread implements RequestVisitor {
         }
     }
 
+    public void sendEvent(ClientEvent event) {
+        try {
+            out.writeObject(event);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public void visit(GetSagasLinkedToMovieRequest getSagasLinkedToMovieRequest) {
         int movieId = getSagasLinkedToMovieRequest.getMovieId();
@@ -77,6 +86,7 @@ public class ClientHandler extends Thread implements RequestVisitor {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        sendEvent(updateMovieRequest);
     }
 
     @Override
@@ -119,6 +129,7 @@ public class ClientHandler extends Thread implements RequestVisitor {
     public void visit(GetRoomsRequest getRoomsRequest) {
         try {
             getRoomsRequest.setRooms(roomDAO.getAll());
+            System.out.println("Rooms: " + getRoomsRequest.getRooms());
             out.writeObject(getRoomsRequest);
         } catch (IOException | SQLException e) {
             throw new RuntimeException(e);
